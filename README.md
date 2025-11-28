@@ -1,4 +1,5 @@
-# PicoFino Hub — UniOvi Innovation Skills
+
+<img width="1195" height="486" alt="logo" src="https://github.com/user-attachments/assets/218cedfb-2449-486e-b638-38a70ba79d1c" />
 
 🌐 Puedes visitar la página [aquí](https://albaaglz.github.io/PicoFino-Hub/index.html).
 
