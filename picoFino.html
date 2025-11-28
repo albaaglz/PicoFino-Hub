@@ -1,0 +1,1892 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Picofino Club - Portal de Gestión Comercial</title>
+    <!-- Carga de Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Carga de Lucide Icons (para iconos) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Nuevo Tema Picofino: Amarillo Corporativo y Fondos Oscuros */
+        :root {
+            /* Amarillo Corporativo (Acento, Botones, KPIs, Iconos) */
+            --color-picofino-accent: #FFC72C; 
+            /* Amarillo Oscuro/Naranja para Hover */
+            --color-picofino-dark-accent: #FFAD00; 
+            /* Fondo de la Aplicación (Gris muy oscuro/negruzco) */
+            --color-app-bg: #1A202C; 
+            /* Fondo de Tarjetas/Contenedores (Azul-gris oscuro) */
+            --color-card-bg: #2D3748; 
+            /* Texto oscuro para contraste sobre amarillo */
+            --color-picofino-text-dark: #1A202C;
+        }
+
+        /* 1. Reemplazar la paleta 'picofino' (que era azul) por el amarillo de acento */
+        .bg-picofino { background-color: var(--color-picofino-accent); }
+        .text-picofino { color: var(--color-picofino-accent); }
+        .border-picofino { border-color: var(--color-picofino-accent); }
+        .ring-picofino:focus { --tw-ring-color: var(--color-picofino-accent); }
+        
+        /* 2. Estilos generales y fondos oscuros */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--color-app-bg);
+        }
+        
+        /* 3. Ajustar los tonos de gris de Tailwind para el tema oscuro/azul */
+        .bg-gray-800 { background-color: var(--color-card-bg); } /* Encabezado y Main Container */
+        .bg-gray-700 { background-color: #4A5568; } /* Tarjetas internas, selectores, inputs */
+        .bg-gray-900 { background-color: var(--color-app-bg); } /* Fondo de historial, tablas */
+
+        /* 4. Ajustar colores de texto y borde genéricos usados por el markup */
+        .text-white { color: #E2E8F0; } /* Usar un blanco roto/claro para accesibilidad en fondo oscuro */
+        .text-gray-400 { color: #A0AEC0; }
+        .text-gray-300 { color: #CBD5E0; }
+        .border-gray-600 { border-color: #4A5568; }
+
+        /* 5. Ajustes de color para el tema oscuro (mic button/checkboxes) */
+        /* Botón Flotante y Botones Primarios (amarillo de acento) */
+        .bg-green-600 { background-color: var(--color-picofino-accent); }
+        .hover\:bg-green-700:hover { background-color: var(--color-picofino-dark-accent); } 
+        /* Texto del botón flotante debe ser oscuro para contraste con amarillo */
+        #quick-entry-button { color: var(--color-picofino-text-dark); }
+        /* Texto de botones con fondo picofino */
+        button.bg-picofino, .bg-picofino { color: var(--color-picofino-text-dark); } 
+
+
+        .text-green-400 { color: #48BB78; } 
+        .bg-green-900 { background-color: #1E403C; } 
+        .text-green-300 { color: #68D391; }
+        .bg-picofino:hover { background-color: var(--color-picofino-dark-accent); }
+
+
+        /* Estilos específicos para los puntos del mapa */
+        .map-point {
+            transform: translate(-50%, -100%); 
+        }
+
+        /* Estilo para el Tooltip (Hover) en los nombres de producto de Pedidos */
+        .product-tooltip-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .product-tooltip {
+            visibility: hidden;
+            width: 200px;
+            background-color: var(--color-card-bg);
+            color: #E2E8F0;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px 10px;
+            position: absolute;
+            z-index: 10;
+            bottom: 125%; /* Encima */
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--color-picofino-accent);
+            pointer-events: none; /* No bloquear clicks */
+        }
+
+        .product-tooltip-container:hover .product-tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Toggle Switch Styling */
+        .toggle-switch {
+            @apply relative inline-block w-14 h-8 transition duration-200 ease-in-out cursor-pointer;
+        }
+        .toggle-switch input {
+            @apply opacity-0 w-0 h-0;
+        }
+        .toggle-slider {
+            @apply absolute cursor-pointer top-0 left-0 right-0 bottom-0 bg-gray-600 rounded-full shadow-inner;
+            transition: .4s;
+        }
+        .toggle-slider:before {
+            @apply absolute content-[''] h-6 w-6 left-1 bottom-1 bg-white rounded-full shadow;
+            transition: .4s;
+        }
+        input:checked + .toggle-slider {
+            @apply bg-picofino;
+        }
+        input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+
+        /* --- ESTILOS ROADMAP CANDY CRUSH --- */
+        .roadmap-path {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 8px;
+            background: #4A5568;
+            transform: translateX(-50%);
+            border-radius: 4px;
+            z-index: 0;
+        }
+        
+        /* Efecto de nodo de nivel */
+        .level-node {
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .level-node:hover {
+            transform: scale(1.1);
+        }
+        
+        /* Estrellas flotantes */
+        .stars-container {
+            position: absolute;
+            top: -15px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 2px;
+        }
+        
+        /* Animación simple de pulso para el siguiente nivel disponible */
+        @keyframes pulse-ring {
+            0% { box-shadow: 0 0 0 0 rgba(255, 199, 44, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 199, 44, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 199, 44, 0); }
+        }
+        .level-active {
+            animation: pulse-ring 2s infinite;
+        }
+
+        /* --- MOBILE: convertir pestañas en menú lateral --- */
+        @media (max-width: 768px) {
+            #distributor-tabs {
+                display: flex;
+                flex-direction: column;
+                border-right: 1px solid #4A5568;
+                width: 180px;
+                padding-right: 10px;
+            }
+
+            #dashboard-tabs-wrapper {
+                display: flex;
+                flex-direction: row;
+            }
+
+            #dashboard-content {
+                margin-left: 15px;
+                flex-grow: 1;
+            }
+        }
+
+
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8">
+
+    <div id="app" class="max-w-7xl mx-auto">
+        <!-- Encabezado y Selector de Usuario (Login Mock) -->
+        <header class="mb-8 p-4 bg-gray-800 rounded-xl shadow-lg flex flex-col md:flex-row justify-between items-center">
+            <h1 class="text-3xl font-extrabold text-picofino mb-4 md:mb-0">
+                <i data-lucide="award" class="inline-block mr-2 w-6 h-6"></i>
+                Picofino Sales Hub (Mockup Estático)
+            </h1>
+            <div id="auth-section" class="flex items-center space-x-4">
+                <span class="text-white text-sm">Seleccionar Rol:</span>
+                <select id="user-selector" onchange="mockLogin(this.value)" 
+                        class="p-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:ring-picofino focus:border-picofino transition">
+                    <option value="">-- Elige Usuario --</option>
+                    <option value="owner">Product Owner (Picofino)</option>
+                    <option value="oviedo">Distribuidor Oviedo</option>
+                    <option value="gijon">Distribuidor Gijón</option>
+                    <option value="bcn">Distribuidor Barcelona</option>
+                    <option value="sev">Distribuidor Sevilla</option>
+                </select>
+            </div>
+        </header>
+
+        <!-- Contenedor Principal del Dashboard (Se llenará con JS) -->
+        <main id="dashboard-container" class="bg-gray-800 p-6 rounded-xl shadow-2xl min-h-[60vh]">
+            <div class="text-center text-gray-400 p-10">
+                <i data-lucide="key-round" class="w-12 h-12 mx-auto text-gray-500 mb-4"></i>
+                <p>Por favor, selecciona un rol para acceder al portal.</p>
+            </div>
+        </main>
+        
+        <!-- Contenedor del Modal (para reemplazar alert/confirm) -->
+        <div id="modal-container" class="fixed inset-0 bg-black bg-opacity-70 hidden justify-center items-center z-50">
+            <div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full">
+                <h3 id="modal-title" class="text-xl font-bold mb-3 text-gray-800"></h3>
+                <p id="modal-message" class="text-gray-600 mb-4"></p>
+                <button onclick="closeModal()" class="w-full bg-picofino hover:bg-yellow-500 text-gray-900 font-bold py-2 px-4 rounded-lg transition duration-200">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Botón Flotante para Entrada Rápida -->
+    <button id="quick-entry-button" 
+            onclick="showModal('Asistente de Voz / Chat', '¡Escuchando! Esta función simularía la entrada por voz o chat. Ej: \'Bar El Antiguo, 5 Anchoas, 2 Crema de Turrón\'.')"
+            class="fixed bottom-8 right-8 z-40 bg-green-600 hover:bg-green-700 text-white font-bold p-4 rounded-full shadow-2xl transition duration-300 transform hover:scale-105 hidden"
+            title="Entrada Rápida por Voz/Chat">
+        <i data-lucide="mic" class="w-7 h-7"></i>
+    </button>
+
+    <!-- Script principal de la aplicación -->
+    <script type="module">
+        // --- 1. CONFIGURACIÓN ESTATICA Y DATOS MOCK ---
+        
+        let currentUserId = null;
+        let currentRole = null;
+        
+        // Estado de la UI para las pestañas
+        let currentOwnerTab = 'global'; // 'global' | 'distributors'
+        // ACTUALIZADO: Añadidas 'orders' y 'inventory'
+        let currentDistributorTab = 'dashboard'; // 'dashboard' | 'achievements' | 'orders' | 'inventory'
+        
+        // Estado de filtro de bebidas para la pestaña de ventas (solo para distribuidores)
+        // CAMBIADO: Valor por defecto a 'magnum'
+        let currentDrinkFilter = 'magnum'; // 'all' | 'standard' | 'mini' | 'magnum'
+
+        // Límite de stock bajo para el aviso (configurable) - AHORA ES UNA VARIABLE GLOBAL
+        let LOW_STOCK_THRESHOLD = 10;
+        
+        // ESTADO DE LA ALARMA DE STOCK BAJO (NUEVO)
+        let isLowStockAlarmEnabled = true;
+
+        // ESTADO DEL FILTRO DE BÚSQUEDA DE PEDIDOS (NUEVO)
+        let orderSearchQuery = '';
+
+        // Datos de Muestra de Productos (ACTUALIZADOS CON LA LISTA PROPORCIONADA Y CATEGORÍA)
+        const PRODUCTS = [
+            // Se añade la propiedad 'category'
+            { id: 'DIPMEJI', name: 'DIP MEJILLONES Y BONITO', unitsPerBox: 24, price: 7.90, category: 'Comida' },
+            { id: 'CREMAGT', name: 'CREMA DE GINEBRA Y TURRÓN', unitsPerBox: 12, price: 22.90, category: 'Bebida', format: 'standard' }, 
+            { id: 'VOGF', name: 'VERMUT ORIGINAL GIN FUSION', unitsPerBox: 6, price: 19.90, category: 'Bebida', format: 'standard' },
+            { id: 'VNGF', name: 'VERMUT NARANJA GIN FUSION', unitsPerBox: 6, price: 19.90, category: 'Bebida', format: 'standard' },
+            { id: 'CREMAGT_TRUFA', name: 'CREMA DE GINEBRA CON TRUFA NEGRA', unitsPerBox: 12, price: 22.90, category: 'Bebida', format: 'standard' }, 
+            { id: 'GINO', name: 'GIN ORIGINAL', unitsPerBox: 6, price: 25.00, category: 'Bebida', format: 'standard' },
+            { id: 'MINIVOGF', name: 'MINI VERMUT ORIGINAL GIN FUSION', unitsPerBox: 24, price: 8.70, category: 'Bebida', format: 'mini' },
+            { id: 'MINIVNGF', name: 'MINI VERMUT NARANJA GIN FUSION', unitsPerBox: 24, price: 8.70, category: 'Bebida', format: 'mini' },
+            { id: 'MINITURRON', name: 'MINI CREMA DE TURRÓN', unitsPerBox: 24, price: 9.90, category: 'Bebida', format: 'mini' },
+            { id: 'MINITRUFA', name: 'MINI CREMA DE GINEBRA CON TRUFA NEGRA', unitsPerBox: 24, price: 9.90, category: 'Bebida', format: 'mini' },
+            { id: 'MINIGINO', name: 'MINI GIN ORIGINAL', unitsPerBox: 24, price: 11.45, category: 'Bebida', format: 'mini' },
+            { id: 'DMVOGF', name: 'DOBLE MAGNUM VERMUT ORIGINAL GIN FUSION (3 litros)', unitsPerBox: 1, price: 46.90, category: 'Bebida', format: 'magnum' },
+            { id: 'DMVNGF', name: 'DOBLE MAGNUM VERMUT NARANJA GIN FUSION (3 litros)', unitsPerBox: 1, price: 46.90, category: 'Bebida', format: 'magnum' },
+            { id: 'MORCILLA', name: 'DOÑA MORCILLA PICOFINO', unitsPerBox: 48, price: 9.90, category: 'Comida' },
+            { id: 'GILDAE', name: 'DOÑA GILDA PICOFINO ESPECIAL', unitsPerBox: 48, price: 11.70, category: 'Comida' },
+            { id: 'MEJIESCABECHE', name: 'MEJILLONES CON ESCABECHE DE VERMUT PICOFINO', unitsPerBox: 24, price: 10.20, category: 'Comida' },
+            { id: 'MINIBOX', name: 'MINI BOX DEGUSTACIÓN PICOFINO', unitsPerBox: 12, price: 30.50, category: 'Comida' },
+        ];
+        
+        // Datos de Muestra de Distribuidores
+        const DISTRIBUTORS = {
+            owner: { id: 'po_picofino', name: 'Product Owner Picofino', role: 'owner' },
+            oviedo: { id: 'dist_oviedo', name: 'Oviedo Sabor SL', role: 'distributor', city: 'Oviedo' },
+            gijon: { id: 'dist_gijon', name: 'Gijón Gourmet SL', role: 'distributor', city: 'Gijón' },
+            bcn: { id: 'dist_bcn', name: 'Barcelona Foodies', role: 'distributor', city: 'Barcelona' }, 
+            sev: { id: 'dist_sev', name: 'Sevilla Abastos', role: 'distributor', city: 'Sevilla' },     
+        };
+        
+        // Global Mock Clients
+        const MOCK_CLIENTS = [
+            // 2 Bares para Oviedo
+            { name: 'Bar El Antiguo', city: 'Oviedo', type: 'Bar', distributorId: 'dist_oviedo' },
+            { name: 'Terraza de Gascona', city: 'Oviedo', type: 'Bar', distributorId: 'dist_oviedo' },
+            // 1 Bar y 1 Tienda para Gijón
+            { name: 'Bar La Playa', city: 'Gijón', type: 'Bar', distributorId: 'dist_gijon' },
+            { name: 'Tienda Delicatessen', city: 'Gijón', type: 'Tienda Gourmet', distributorId: 'dist_gijon' },
+            // Nuevos para Barcelona
+            { name: 'Tapas Gaudí', city: 'Barcelona', type: 'Bar', distributorId: 'dist_bcn' },
+            { name: 'Colmado Bcn', city: 'Barcelona', type: 'Tienda Gourmet', distributorId: 'dist_bcn' },
+            // Nuevos para Sevilla
+            { name: 'Bodega Triana', city: 'Sevilla', type: 'Bar', distributorId: 'dist_sev' },
+            { name: 'Vermutería Alfalfa', city: 'Sevilla', type: 'Vermutería', distributorId: 'dist_sev' },
+        ];
+
+        // Mock Achievements para Distribuidor (ACTUALIZADOS)
+        // Se añaden niveles y se mapean iconos y colores para el nuevo diseño
+        const ACHIEVEMENTS = [
+            { id: 1, name: "Bienvenido", target: 1, metric: 'login', icon: 'medal', level: 'Bronze', achieved: true, description: "Bienvenido a la Aventura Picofino", reward: "Pack de Merchandising Básico Picofino" },
+            { id: 2, name: "Distribuidor Bronce", target: 30, metric: 'units', icon: 'medal', level: 'Bronze', achieved: false, description: "Supera las 30 unidades grandes vendidas.", reward: "Pack de Merchandising Básico Picofino" },
+            { id: 3, name: "Distribuidor Plata", target: 100, metric: 'units', icon: 'medal', level: 'Silver', achieved: false, description: "Supera las 100 unidades grandes vendidas.", reward: "Descuento del 2% en el próximo pedido" },
+            { id: 4, name: "Cazador de Bares", target: 5, metric: 'newClients', icon: 'zap', level: 'Bronze', achieved: false, description: "Consigue 5 altas de clientes nuevas.", reward: "Unidad de Muestras Gratis para nuevos clientes" },
+            { id: 5, name: "Maestro Turrón", target: 30, metric: 'CREMA DE GINEBRA Y TURRÓN_units', icon: 'snowflake', level: 'Silver', achieved: false, description: "Vende 30 unidades grandes de CREMA DE GINEBRA Y TURRÓN.", reward: "Botella Edición Limitada Picofino" },
+            { id: 6, name: "Vermutero", target: 40, metric: 'VERMUT ORIGINAL GIN FUSION_units', icon: 'shrimp', level: 'Gold', achieved: false, description: "Vende 40 unidades grandes de VERMUT ORIGINAL GIN FUSION.", reward: "Kit de Coctelería Premium Picofino" },
+            { id: 7, name: "Distribuidor Oro", target: 300, metric: 'units', icon: 'medal', level: 'Gold', achieved: false, description: "Supera las 300 unidades grandes vendidas.", reward: "Experiencia VIP: Visita a la Bodega y Cena" },
+        ];
+
+
+        // Colores para el mapa
+        const DISTRIBUTOR_COLORS = {
+            'dist_oviedo': 'text-red-400', 
+            'dist_gijon': 'text-cyan-400',
+            'dist_bcn': 'text-yellow-400',
+            'dist_sev': 'text-purple-400',
+        };
+        
+        // Array para almacenar los datos de ventas (Reemplaza a Firestore)
+        let MOCK_SALES_DATA = [];
+
+        // ESTRUCTURA JSON MOCK: INVENTARIO (Stock) - AJUSTADO
+        let MOCK_INVENTORY_DATA = [
+            { distributorId: 'dist_oviedo', productName: 'GIN ORIGINAL', units: 15, lastUpdated: Date.now() },
+            { distributorId: 'dist_oviedo', productName: 'CREMA DE GINEBRA Y TURRÓN', units: 8, lastUpdated: Date.now() }, // LOW STOCK
+            { distributorId: 'dist_oviedo', productName: 'DOÑA GILDA PICOFINO ESPECIAL', units: 25, lastUpdated: Date.now() },
+
+            { distributorId: 'dist_gijon', productName: 'VERMUT ORIGINAL GIN FUSION', units: 12, lastUpdated: Date.now() },
+            { distributorId: 'dist_gijon', productName: 'VERMUT NARANJA GIN FUSION', units: 5, lastUpdated: Date.now() }, // LOW STOCK
+            { distributorId: 'dist_gijon', productName: 'MINI BOX DEGUSTACIÓN PICOFINO', units: 30, lastUpdated: Date.now() },
+
+            { distributorId: 'dist_bcn', productName: 'DOÑA MORCILLA PICOFINO', units: 40, lastUpdated: Date.now() },
+            { distributorId: 'dist_bcn', productName: 'DIP MEJILLONES Y BONITO', units: 9, lastUpdated: Date.now() }, // LOW STOCK
+            
+            { distributorId: 'dist_sev', productName: 'MEJILLONES CON ESCABECHE DE VERMUT PICOFINO', units: 18, lastUpdated: Date.now() },
+            { distributorId: 'dist_sev', productName: 'MINI CREMA DE TURRÓN', units: 10, lastUpdated: Date.now() },
+        ];
+
+        // ESTRUCTURA JSON MOCK: PEDIDOS
+        let MOCK_ORDERS_DATA = [
+            { id: 1, distributorId: 'dist_oviedo', date: Date.now() - 86400000 * 5, status: 'Recibido', items: [{ name: 'GIN ORIGINAL', units: 10 }] },
+            { id: 2, distributorId: 'dist_gijon', date: Date.now() - 86400000 * 2, status: 'En Proceso', items: [{ name: 'VERMUT NARANJA GIN FUSION', units: 20 }, { name: 'CREMA DE GINEBRA Y TURRÓN', units: 5 }] },
+        ];
+
+        // --- Funciones de utilidad para gamificación ---
+        function getLevelColor(level, isAchieved = false) {
+            if (isAchieved) return 'text-green-400 border-green-400 bg-green-900/40';
+            
+            switch (level) {
+                case 'Bronze': return 'text-amber-500 border-amber-600 bg-amber-900/30';
+                case 'Silver': return 'text-gray-300 border-gray-400 bg-gray-600/30';
+                case 'Gold': return 'text-yellow-400 border-yellow-500 bg-yellow-900/30';
+                case 'Platinum': return 'text-cyan-400 border-cyan-500 bg-cyan-900/30';
+                default: return 'text-gray-400 border-gray-600 bg-gray-700/30';
+            }
+        }
+        function getMedalIcon(level, isAchieved = false) {
+             const baseIcon = isAchieved ? 'medal' : 'circle';
+             if (level === 'Bronze') return 'award';
+             if (level === 'Silver') return 'crown';
+             if (level === 'Gold') return 'star';
+             if (level === 'Platinum') return 'zap';
+             return baseIcon;
+        }
+
+
+        // --- Inicialización de Datos Mock (Reemplaza seedInitialData) ---
+        function initializeMockData() {
+            console.log("Inicializando datos de ventas estáticos...");
+
+            // Usar algunos de los nuevos productos para las ventas de mock
+            const P_VOGF = PRODUCTS.find(p => p.id === 'VOGF').name; // VERMUT ORIGINAL GIN FUSION
+            const P_CREMAGT = PRODUCTS.find(p => p.id === 'CREMAGT' && p.category === 'Bebida').name; // CREMA DE GINEBRA Y TURRÓN
+            const P_MORCILLA = PRODUCTS.find(p => p.id === 'MORCILLA').name; // DOÑA MORCILLA PICOFINO
+            const P_MEJIES = PRODUCTS.find(p => p.id === 'MEJIESCABECHE').name; // MEJILLONES CON ESCABECHE...
+
+            const baseSales = [
+                // Datos base (8 entregas)
+                { distributorId: 'dist_oviedo', distributorName: 'Oviedo Sabor SL', city: 'Oviedo', clientName: 'Bar El Antiguo', clientType: 'Bar', productName: P_CREMAGT, unitsSold: 20, newClient: false },
+                { distributorId: 'dist_oviedo', distributorName: 'Oviedo Sabor SL', city: 'Oviedo', clientName: 'Terraza de Gascona', clientType: 'Bar', productName: P_VOGF, unitsSold: 5, newClient: true }, 
+                { distributorId: 'dist_gijon', distributorName: 'Gijón Gourmet SL', city: 'Gijón', clientName: 'Bar La Playa', clientType: 'Bar', productName: P_MEJIES, unitsSold: 15, newClient: false },
+                { distributorId: 'dist_gijon', distributorName: 'Gijón Gourmet SL', city: 'Gijón', clientName: 'Tienda Delicatessen', clientType: 'Tienda Gourmet', productName: P_MORCILLA, unitsSold: 10, newClient: false },
+                { distributorId: 'dist_bcn', distributorName: 'Barcelona Foodies', city: 'Barcelona', clientName: 'Tapas Gaudí', clientType: 'Bar', productName: P_CREMAGT, unitsSold: 40, newClient: false },
+                { distributorId: 'dist_bcn', distributorName: 'Barcelona Foodies', city: 'Barcelona', clientName: 'Colmado Bcn', clientType: 'Tienda Gourmet', productName: P_VOGF, unitsSold: 2, newClient: false },
+                { distributorId: 'dist_sev', distributorName: 'Sevilla Abastos', city: 'Sevilla', clientName: 'Bodega Triana', clientType: 'Bar', productName: P_MORCILLA, unitsSold: 30, newClient: true }, 
+                { distributorId: 'dist_sev', distributorName: 'Sevilla Abastos', city: 'Sevilla', clientName: 'Vermutería Alfalfa', clientType: 'Vermutería', productName: P_MEJIES, unitsSold: 1, newClient: false },
+            ];
+
+            // Generar ventas aleatorias adicionales a clientes existentes (15 entregas)
+            const randomSales = [];
+            for (let i = 0; i < 15; i++) {
+                const randomClientIndex = Math.floor(Math.random() * MOCK_CLIENTS.length);
+                const client = MOCK_CLIENTS[randomClientIndex];
+                
+                const randomProductIndex = Math.floor(Math.random() * PRODUCTS.length);
+                const product = PRODUCTS[randomProductIndex];
+
+                const units = Math.floor(Math.random() * 8) + 1; // 1 to 8 units (cases)
+                
+                // Simular una venta histórica.
+                randomSales.push({
+                    distributorId: client.distributorId,
+                    distributorName: DISTRIBUTORS[Object.keys(DISTRIBUTORS).find(k => DISTRIBUTORS[k].id === client.distributorId)].name,
+                    city: client.city,
+                    productName: product.name,
+                    unitsSold: units,
+                    clientName: client.name,
+                    clientType: client.type,
+                    newClient: false, 
+                });
+            }
+            
+            // Combinar y asignar IDs y un timestamp de mock para ordenar
+            let idCounter = 1;
+            MOCK_SALES_DATA = [...baseSales, ...randomSales].map(sale => ({
+                ...sale,
+                id: `sale_${idCounter++}`,
+                timestamp: Date.now() - (Math.random() * 10000000) // Mock timestamp para ordenar
+            }));
+            
+            // Asegurar que estén ordenados por el mock timestamp
+            MOCK_SALES_DATA.sort((a, b) => b.timestamp - a.timestamp);
+            
+            console.log(`Datos estáticos inicializados: ${MOCK_SALES_DATA.length} ventas.`);
+        }
+        
+        // Llamar a la inicialización de datos al cargar el script
+        initializeMockData();
+
+        // --- Funciones de Utilidad (Modal) ---
+        window.showModal = (title, message) => {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-message').innerHTML = message; // Usar innerHTML para saltos de línea y HTML
+            document.getElementById('modal-container').classList.remove('hidden');
+            document.getElementById('modal-container').classList.add('flex');
+        };
+
+        window.closeModal = () => {
+            document.getElementById('modal-container').classList.remove('flex');
+            document.getElementById('modal-container').classList.add('hidden');
+        };
+
+        // --- Lógica para mostrar/ocultar el botón flotante de entrada rápida ---
+        function toggleQuickEntryButton(show) {
+            const btn = document.getElementById('quick-entry-button');
+            if (btn) {
+                if (show) {
+                    btn.classList.remove('hidden');
+                    lucide.createIcons();
+                } else {
+                    btn.classList.add('hidden');
+                }
+            }
+        }
+        
+        // --- Cambiar Pestañas ---
+        window.changeOwnerTab = (tab) => {
+            currentOwnerTab = tab;
+            renderDashboard(fetchSalesData()); // Re-renderizar con datos filtrados
+        }
+        window.changeDistributorTab = (tab) => {
+            currentDistributorTab = tab;
+            renderDashboard(fetchSalesData()); // Re-renderizar con datos filtrados
+        }
+        
+        // --- Cambiar filtro de Bebidas (Nuevo) ---
+        window.filterDrinks = (format) => {
+            // Este filtro ya no es necesario, pero la función se mantiene para evitar errores si se llama
+            // No hacemos nada, ya que la UI ahora usa desplegables estáticos
+            console.log(`Filtro de bebidas solicitado: ${format}. Ignorando debido a la nueva organización por desplegables.`);
+        };
+
+        // --- Toggle Alarma de Stock Bajo (Nuevo) ---
+        window.toggleLowStockAlarm = () => {
+            isLowStockAlarmEnabled = !isLowStockAlarmEnabled;
+            // Deshabilitar/Habilitar el input del umbral
+            const thresholdInput = document.getElementById('low-stock-config');
+            if (thresholdInput) {
+                thresholdInput.disabled = !isLowStockAlarmEnabled;
+            }
+            // Re-renderizar la pestaña de inventario para aplicar la alarma
+            if (currentDistributorTab === 'inventory') {
+                renderDashboard(fetchSalesData());
+            }
+        }
+
+        // --- Filtro de Pedidos (Historial) - CORREGIDO PARA MANTENER FOCO ---
+        window.filterOrders = (query) => {
+            // 1. Capturar el estado del input ANTES de re-renderizar
+            const searchInput = document.getElementById('order-search');
+            const cursorPosition = searchInput ? searchInput.selectionStart : null;
+            
+            orderSearchQuery = query.toLowerCase().trim();
+            // Forzar el re-renderizado de la pestaña de pedidos
+            if (currentDistributorTab === 'orders') {
+                renderDashboard(fetchSalesData());
+            }
+            
+            // 4. Restaurar el foco y la posición del cursor
+            setTimeout(() => {
+                const newSearchInput = document.getElementById('order-search');
+                if (newSearchInput) {
+                    newSearchInput.focus();
+                    if (cursorPosition !== null) {
+                        // setSelectionRange permite mantener el cursor donde estaba
+                        newSearchInput.setSelectionRange(cursorPosition, cursorPosition);
+                    }
+                }
+            }, 0);
+        }
+
+
+        // --- 2. Simulación de Inicio de Sesión / Selección de Rol ---
+        window.mockLogin = (roleKey) => {
+            const userData = DISTRIBUTORS[roleKey];
+            
+            if (userData) {
+                currentUserId = userData.id;
+                currentRole = userData.role;
+                currentDrinkFilter = 'magnum'; // Mantenemos el filtro por defecto en magnum
+                orderSearchQuery = ''; // Resetear el filtro de búsqueda al cambiar de usuario
+                
+                document.getElementById('user-selector').value = roleKey;
+                document.getElementById('auth-section').querySelector('span').textContent = `Rol Actual: ${userData.name}`;
+                
+                // Obtener datos y renderizar el dashboard
+                renderDashboard(fetchSalesData());
+            } else {
+                currentUserId = null;
+                currentRole = null;
+                document.getElementById('dashboard-container').innerHTML = '<div class="text-center text-gray-400 p-10"><i data-lucide="key-round" class="w-12 h-12 mx-auto text-gray-500 mb-4"></i><p>Por favor, selecciona un rol para acceder al portal.</p></div>';
+            }
+            lucide.createIcons();
+        };
+
+        // --- 3. Obtención de Datos (Reemplaza onSnapshot y queries) ---
+        function fetchSalesData() {
+            if (!currentUserId) return [];
+            
+            let salesData = [...MOCK_SALES_DATA]; // Copia de los datos estáticos
+
+            if (currentRole === 'distributor') {
+                // El Distribuidor solo ve SUS propios datos
+                salesData = salesData.filter(sale => sale.distributorId === currentUserId);
+            }
+            
+            // Los datos ya están ordenados por el mock timestamp al inicializarse
+
+            return salesData;
+        }
+
+        function fetchInventoryData() {
+            if (currentRole !== 'distributor') return [];
+            // Filtrar y asegurar que todos los productos tienen un stock mockeado
+            const distributorInventory = MOCK_INVENTORY_DATA.filter(item => item.distributorId === currentUserId);
+            const inventoryMap = new Map(distributorInventory.map(item => [item.productName, item]));
+
+            // Generar la lista completa de inventario
+            const fullInventory = PRODUCTS.map(product => {
+                const stock = inventoryMap.get(product.name);
+                return stock || { 
+                    distributorId: currentUserId, 
+                    productName: product.name, 
+                    units: 0, 
+                    lastUpdated: Date.now() 
+                };
+            });
+            
+            // ORDENAR: de mayor stock a menor stock
+            fullInventory.sort((a, b) => b.units - a.units);
+
+            return fullInventory;
+        }
+
+        function fetchOrdersData() {
+            if (currentRole !== 'distributor') return [];
+            
+            let orders = MOCK_ORDERS_DATA
+                .filter(order => order.distributorId === currentUserId)
+                .sort((a, b) => b.date - a.date);
+
+            // Aplicar filtro de búsqueda
+            if (orderSearchQuery) {
+                orders = orders.filter(order => {
+                    // Buscar en el ID, el estado o en los nombres de los productos
+                    const idMatch = String(order.id).includes(orderSearchQuery);
+                    const statusMatch = order.status.toLowerCase().includes(orderSearchQuery);
+                    const itemMatch = order.items.some(item => item.name.toLowerCase().includes(orderSearchQuery));
+                    return idMatch || statusMatch || itemMatch;
+                });
+            }
+
+            return orders;
+        }
+        
+        // --- 4. Renderizado del Dashboard (Pestañas) ---
+        function renderDashboard(salesData) {
+            const container = document.getElementById('dashboard-container');
+            
+            if (currentRole === 'owner') {
+                container.innerHTML = renderOwnerDashboard(salesData);
+                toggleQuickEntryButton(false);
+            } else if (currentRole === 'distributor') {
+                container.innerHTML = renderDistributorDashboard(salesData);
+                toggleQuickEntryButton(true);
+            } else {
+                 container.innerHTML = '<div class="text-center text-gray-400 p-10"><i data-lucide="key-round" class="w-12 h-12 mx-auto text-gray-500 mb-4"></i><p>Por favor, selecciona un rol para acceder al portal.</p></div>';
+                 toggleQuickEntryButton(false);
+            }
+            lucide.createIcons();
+        }
+
+        // --- UTILIDADES DEL MAPA ---
+        function generateMockCoords(clientName) {
+            const client = MOCK_CLIENTS.find(c => c.name === clientName);
+            const city = client ? client.city : 'Oviedo';
+
+            const hash = (clientName + city).split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+            
+            let x, y;
+            // Coordenadas simuladas para Oviedo, Gijón, Barcelona y Sevilla
+            if (city === 'Oviedo') {
+                x = 150 + (hash % 100); y = 150 + ((hash * 7) % 100);
+            } else if (city === 'Gijón') {
+                x = 300 + (hash % 100); y = 50 + ((hash * 7) % 100);
+            } else if (city === 'Barcelona') {
+                x = 50 + (hash % 80); y = 200 + ((hash * 5) % 80); // Esquina inferior izquierda (simulando costa este)
+            } else if (city === 'Sevilla') {
+                x = 400 + (hash % 80); y = 200 + ((hash * 5) % 80); // Esquina inferior derecha (simulando sur)
+            } else {
+                x = 200 + (hash % 200); y = 100 + ((hash * 7) % 150);
+            }
+            
+            return { x: (x / 5).toFixed(1), y: (y / 3).toFixed(1) };
+        }
+
+        window.filterMap = (distributorId) => {
+            const points = document.querySelectorAll('.map-point');
+            const filterButtons = document.querySelectorAll('.filter-btn');
+
+            filterButtons.forEach(btn => {
+                btn.classList.remove('bg-picofino', 'text-gray-900');
+                btn.classList.add('bg-gray-700', 'text-white');
+            });
+
+            const activeBtn = document.getElementById(`filter-${distributorId}`) || document.getElementById('filter-all');
+            activeBtn.classList.remove('bg-gray-700', 'text-white');
+            activeBtn.classList.add('bg-picofino', 'text-gray-900');
+
+            points.forEach(point => {
+                const pointDistributorId = point.getAttribute('data-distributor-id');
+                if (distributorId === 'all' || pointDistributorId === distributorId) {
+                    point.classList.remove('hidden');
+                } else {
+                    point.classList.add('hidden');
+                }
+            });
+        };
+
+        window.showMapTooltip = (element, clientName, distributorName, totalUnits) => {
+            const tooltip = document.getElementById('map-tooltip');
+            tooltip.innerHTML = `<p class="font-bold text-picofino">${clientName}</p><p class="text-xs">Distribuidor: ${distributorName}</p><p class="text-xs mt-1">Unidades Totales: <span class="font-bold">${totalUnits}</span></p>`;
+            
+            const pinX = element.offsetLeft;
+            const pinY = element.offsetTop;
+
+            tooltip.style.left = `${pinX + 15}px`;
+            tooltip.style.top = `${pinY - 60}px`; 
+
+            tooltip.classList.remove('hidden', 'opacity-0');
+            tooltip.classList.add('opacity-100');
+        };
+
+        window.hideMapTooltip = () => {
+            const tooltip = document.getElementById('map-tooltip');
+            tooltip.classList.remove('opacity-100');
+            tooltip.classList.add('opacity-0');
+            setTimeout(() => tooltip.classList.add('hidden'), 300); 
+        };
+        // --- FIN UTILIDADES DEL MAPA ---
+
+
+        // --- 4.1. Dashboard del Product Owner (Picofino) ---
+        function renderOwnerDashboard(salesData) {
+            
+            // Pestañas de Navegación
+            const tabs = [
+                { id: 'global', name: 'Visión Global & Mapa', icon: 'globe' },
+                { id: 'distributors', name: 'Detalle Distribuidores', icon: 'users-2' }
+            ];
+
+            let contentHtml = '';
+            
+            if (currentOwnerTab === 'global') {
+                contentHtml = renderOwnerGlobalTab(salesData);
+            } else if (currentOwnerTab === 'distributors') {
+                contentHtml = renderOwnerDistributorsTab(salesData);
+            }
+
+            return `
+                <h2 class="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-picofino pb-3">
+                    <i data-lucide="layout-dashboard" class="inline-block mr-2 w-7 h-7 text-picofino"></i>
+                    Dashboard Product Owner
+                </h2>
+                
+                <!-- Navegación de Pestañas -->
+                <div class="flex border-b border-gray-700 mb-6">
+                    ${tabs.map(tab => `
+                        <button onclick="changeOwnerTab('${tab.id}')"
+                                class="py-2 px-4 text-sm font-medium ${currentOwnerTab === tab.id ? 'border-b-2 border-picofino text-picofino' : 'text-gray-400 hover:text-white'} transition flex items-center">
+                            <i data-lucide="${tab.icon}" class="w-4 h-4 mr-2"></i>
+                            ${tab.name}
+                        </button>
+                    `).join('')}
+                </div>
+                
+                <!-- Contenido de la Pestaña Activa -->
+                ${contentHtml}
+            `;
+        }
+
+        // --- Contenido Pestaña Global (Map & KPIs) ---
+        function renderOwnerGlobalTab(salesData) {
+            const totalUnits = salesData.reduce((sum, s) => sum + s.unitsSold, 0);
+            const totalValue = salesData.reduce((sum, s) => {
+                const product = PRODUCTS.find(p => p.name === s.productName);
+                const price = product ? product.price : 0;
+                // Asumimos que el precio es por la unidad grande (anteriormente caja)
+                return sum + (s.unitsSold * price);
+            }, 0);
+            
+            // Agrupar clientes para el mapa
+            const clientLocations = salesData.reduce((acc, sale) => {
+                const key = sale.clientName; 
+                if (!acc[key]) {
+                    acc[key] = {
+                        name: sale.clientName,
+                        distributorId: sale.distributorId,
+                        distributorName: sale.distributorName,
+                        city: sale.city,
+                        salesCount: 0
+                    };
+                }
+                acc[key].salesCount += sale.unitsSold;
+                return acc;
+            }, {});
+            MOCK_CLIENTS.forEach(mock => {
+                 if (!clientLocations[mock.name]) {
+                      clientLocations[mock.name] = {
+                        name: mock.name,
+                        distributorId: mock.distributorId,
+                        distributorName: DISTRIBUTORS[Object.keys(DISTRIBUTORS).find(k => DISTRIBUTORS[k].id === mock.distributorId)].name,
+                        city: mock.city,
+                        salesCount: 0 
+                      }
+                 }
+            });
+            const uniqueClients = Object.values(clientLocations);
+
+            // Agrupar por distribuidor, calcular unidades, nuevas altas y la PUNTUACIÓN (NUEVO)
+            const distributorSummary = salesData.reduce((acc, sale) => {
+                if (!acc[sale.distributorId]) {
+                    // Inicializar el objeto con las métricas necesarias
+                    acc[sale.distributorId] = {
+                        name: sale.distributorName,
+                        units: 0,
+                        newClients: 0,
+                        score: 0 // Se calculará después de sumar todos los valores
+                    };
+                }
+                // Sumar unidades
+                acc[sale.distributorId].units += sale.unitsSold;
+                // Contar nuevas altas (solo una vez por venta si es nuevo cliente)
+                if (sale.newClient) {
+                    acc[sale.distributorId].newClients += 1;
+                }
+                return acc;
+            }, {});
+
+            // 2. Calcular la Puntuación para cada distribuidor
+            const distributorsWithScore = Object.values(distributorSummary).map(d => {
+                // FÓRMULA: unidades_vendidas*0.4 + nuevas_altas*0.6
+                const score = (d.units * 0.4) + (d.newClients * 0.6);
+                return {
+                    ...d,
+                    score: parseFloat(score.toFixed(2)) // Redondear a 2 decimales para la visualización
+                };
+            });
+
+            // 3. Ordenar por Puntuación descendente
+            const sortedDistributors = distributorsWithScore.sort((a, b) => b.score - a.score);
+
+
+            const distributorKeys = Object.keys(DISTRIBUTORS).filter(k => DISTRIBUTORS[k].role === 'distributor');
+
+
+            const mapHtml = `
+                <h3 class="text-xl font-semibold mb-4 text-white flex items-center mt-8">
+                    <i data-lucide="map-pin" class="mr-2 text-picofino"></i>
+                    Mapa de Clientes Activos (Mockup Geográfico)
+                </h3>
+                <div class="bg-gray-900 p-4 rounded-xl shadow-lg">
+                    <div class="mb-4 flex flex-wrap items-center space-x-3 sm:space-x-4">
+                        <span class="text-gray-400 text-sm font-medium">Filtrar:</span>
+                        <button onclick="filterMap('all')" id="filter-all" class="filter-btn bg-picofino text-gray-900 font-bold py-1 px-3 rounded-full text-sm transition shadow-md">Todos</button>
+                        ${distributorKeys.map(key => {
+                            const distributor = DISTRIBUTORS[key];
+                            const colorClass = DISTRIBUTOR_COLORS[distributor.id].replace('text-', 'bg-');
+                            return `<button onclick="filterMap('${distributor.id}')" id="filter-${distributor.id}" 
+                                        class="filter-btn bg-gray-700 text-white py-1 px-3 rounded-full text-sm hover:bg-gray-600 transition">
+                                        <span class="inline-block w-3 h-3 rounded-full mr-1 ${colorClass}"></span>
+                                        ${distributor.name.split(' ')[0]}
+                                    </button>`;
+                        }).join('')}
+                    </div>
+
+                    <div id="client-map-area" 
+                        class="relative w-full h-[300px] bg-gray-700 rounded-lg overflow-hidden border-2 border-gray-600"
+                        style="background-image: url('https://placehold.co/500x300/2C3A50/FFFFFF?text=ASTURIAS-CATALUÑA-ANDALUCÍA+MOCKUP'); background-size: cover; background-position: center;">
+                        
+                        ${uniqueClients.map(client => {
+                            const coords = generateMockCoords(client.name);
+                            const colorClass = DISTRIBUTOR_COLORS[client.distributorId] || 'text-white';
+                            
+                            return `
+                                <div class="map-point absolute cursor-pointer transition-transform duration-100 hover:scale-150"
+                                    data-distributor-id="${client.distributorId}"
+                                    style="left: ${coords.x}%; top: ${coords.y}%;"
+                                    onmouseover="showMapTooltip(this, '${client.name}', '${client.distributorName}', ${client.salesCount})"
+                                    onmouseout="hideMapTooltip()">
+                                    <i data-lucide="map-pin" class="w-5 h-5 ${colorClass} drop-shadow-lg fill-current"></i>
+                                </div>
+                            `;
+                        }).join('')}
+
+                        <div id="map-tooltip" class="absolute hidden bg-gray-900 text-white p-2 rounded-lg shadow-xl text-xs z-20 pointer-events-none border border-picofino transition-opacity duration-300 opacity-0 min-w-[150px]">
+                        </div>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-2">*Ubicaciones simuladas para Asturias, Barcelona y Sevilla.</p>
+                </div>
+            `;
+            
+
+            return `
+                <!-- KPIs Globales -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-gray-700 p-5 rounded-xl shadow-md border-t-4 border-picofino">
+                        <p class="text-sm text-gray-400">Total de Unidades Vendidas</p>
+                        <p class="text-3xl font-bold text-white">${totalUnits}</p>
+                    </div>
+                    <div class="bg-gray-700 p-5 rounded-xl shadow-md border-t-4 border-picofino">
+                        <p class="text-sm text-gray-400">Valor Estimado Total</p>
+                        <p class="text-3xl font-bold text-white">${totalValue.toFixed(2)} €</p>
+                    </div>
+                    <div class="bg-gray-700 p-5 rounded-xl shadow-md border-t-4 border-picofino">
+                        <p class="text-sm text-gray-400">Clientes Nuevos Totales</p>
+                        <p class="text-3xl font-bold text-white">${salesData.filter(s => s.newClient).length}</p>
+                    </div>
+                </div>
+
+                <!-- MAPA -->
+                ${mapHtml}
+
+                <!-- Ranking de Distribuidores -->
+                <h3 class="text-xl font-semibold mb-4 text-white mt-8">Ranking de Distribuidores (Unidades Vendidas y Puntuación)</h3>
+                <div class="overflow-x-auto mb-8">
+                    <table class="min-w-full divide-y divide-gray-700 rounded-lg overflow-hidden">
+                        <thead class="bg-gray-700">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">#</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Distribuidor</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Unidades Vendidas</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Altas Nuevas</th>
+                                <!-- NUEVA COLUMNA DE PUNTUACIÓN -->
+                                <th class="px-6 py-3 text-right text-xs font-medium text-picofino uppercase tracking-wider">Puntuación</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-gray-900 divide-y divide-gray-700">
+                            ${sortedDistributors.map((d, index) => `
+                                <tr class="${index === 0 ? 'text-picofino font-bold' : 'text-gray-300'}">
+                                    <td class="px-6 py-4 whitespace-nowrap">${index + 1}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">${d.name}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">${d.units}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">${d.newClients}</td>
+                                    <!-- VALOR DE PUNTUACIÓN -->
+                                    <td class="px-6 py-4 whitespace-nowrap text-right font-mono">${d.score.toFixed(2)}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                    <p class="text-xs text-gray-500 mt-2 p-2">*Puntuación calculada como: Unidades Vendidas * 0.4 + Altas Nuevas * 0.6</p>
+                </div>
+            `;
+        }
+
+        // --- Contenido Pestaña Distribuidores (Detalle) ---
+        function renderOwnerDistributorsTab(salesData) {
+            const allDistributors = Object.values(DISTRIBUTORS).filter(d => d.role === 'distributor');
+            
+            // 1. Agrupar datos por distribuidor para el detalle
+            const distributorDataMap = allDistributors.map(dist => {
+                const mySales = salesData.filter(s => s.distributorId === dist.id);
+                
+                // Calcular Total Units
+                const totalUnits = mySales.reduce((sum, s) => sum + s.unitsSold, 0);
+
+                // Calcular Nuevas Altas (clientes nuevos)
+                const newClientsCount = mySales.filter(s => s.newClient).length;
+
+                // Calcular Desglose de Productos (Product Sales Breakdown)
+                const productSales = mySales.reduce((acc, s) => {
+                    acc[s.productName] = (acc[s.productName] || 0) + s.unitsSold;
+                    return acc;
+                }, {});
+                
+                // Convertir a array, filtrar > 0 y ordenar descendente
+                const sortedProductSales = Object.entries(productSales)
+                    .map(([name, total]) => ({ name, total }))
+                    .filter(item => item.total > 0)
+                    .sort((a, b) => b.total - a.total);
+
+                // Calcular Zona Viva (ciudad con más clientes o ventas)
+                const clientCities = mySales.reduce((acc, s) => {
+                    acc[s.city] = (acc[s.city] || 0) + 1;
+                    return acc;
+                }, {});
+                const zonaVivaEntry = Object.entries(clientCities).sort(([, a], [, b]) => b - a)[0];
+                const zonaViva = zonaVivaEntry ? zonaVivaEntry[0] : 'N/A';
+
+                // Calcular Bar Favorito (Cliente con más compras)
+                const clientSales = mySales.reduce((acc, s) => {
+                    acc[s.clientName] = (acc[s.clientName] || 0) + s.unitsSold;
+                    return acc;
+                }, {});
+                const favBarEntry = Object.entries(clientSales).sort(([, a], [, b]) => b - a)[0];
+                const favBar = favBarEntry ? favBarEntry[0] : 'N/A';
+
+
+                return {
+                    ...dist,
+                    totalUnits,
+                    newClientsCount,
+                    sortedProductSales,
+                    zonaViva,
+                    favBar
+                };
+            });
+
+
+            return `
+                <h3 class="text-xl font-semibold mb-4 text-white">Detalle de Distribuidores</h3>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    ${distributorDataMap.map(d => {
+                        // Generar HTML para la lista de productos
+                        const productListHtml = d.sortedProductSales.length > 0 
+                            ? d.sortedProductSales.map((p, idx) => `
+                                <div class="flex justify-between items-center text-sm border-b border-gray-600 py-1 last:border-0">
+                                    <span class="text-gray-300 w-3/4 truncate">${idx + 1}. ${p.name}</span>
+                                    <span class="font-mono text-picofino font-bold">${p.total}</span>
+                                </div>
+                              `).join('')
+                            : '<p class="text-gray-500 text-sm italic">Sin ventas registradas.</p>';
+
+                        return `
+                        <div class="bg-gray-700 rounded-xl shadow-lg border-t-4 border-picofino overflow-hidden">
+                            <!-- Encabezado de la Unidad -->
+                            <div class="p-5 bg-gray-800 border-b border-gray-600 flex justify-between items-center">
+                                <div>
+                                    <h4 class="text-lg font-bold text-white">${d.name}</h4>
+                                    <p class="text-xs text-gray-400 flex items-center"><i data-lucide="map-pin" class="w-3 h-3 mr-1"></i> ${d.city}</p>
+                                </div>
+                                <div class="text-right">
+                                    <span class="block text-2xl font-bold text-picofino">${d.totalUnits}</span>
+                                    <span class="text-xs text-gray-400 uppercase tracking-wider">Unidades Totales</span>
+                                </div>
+                            </div>
+                            
+                            <div class="p-5 grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <!-- Columna Izquierda: KPIs Contextuales -->
+                                <div class="space-y-4">
+                                    <div class="bg-gray-800/50 p-3 rounded-lg">
+                                        <p class="text-xs text-gray-400 uppercase mb-1">Nuevas Altas</p>
+                                        <div class="flex items-center">
+                                            <i data-lucide="user-plus" class="w-5 h-5 text-green-400 mr-2"></i>
+                                            <span class="text-xl font-bold text-white">${d.newClientsCount}</span>
+                                        </div>
+                                    </div>
+                                    <div class="bg-gray-800/50 p-3 rounded-lg">
+                                        <p class="text-xs text-gray-400 uppercase mb-1">Bar Favorito</p>
+                                        <div class="flex items-center">
+                                            <i data-lucide="store" class="w-5 h-5 text-yellow-400 mr-2"></i>
+                                            <span class="text-sm font-medium text-white truncate" title="${d.favBar}">${d.favBar}</span>
+                                        </div>
+                                    </div>
+                                    <div class="bg-gray-800/50 p-3 rounded-lg">
+                                        <p class="text-xs text-gray-400 uppercase mb-1">Zona Viva</p>
+                                        <div class="flex items-center">
+                                            <i data-lucide="navigation" class="w-5 h-5 text-blue-400 mr-2"></i>
+                                            <span class="text-sm font-medium text-white">${d.zonaViva}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Columna Derecha: Desglose de Productos -->
+                                <div class="bg-gray-800/30 rounded-lg p-3">
+                                    <p class="text-xs text-gray-400 uppercase mb-2 border-b border-gray-600 pb-1">Ventas por Producto</p>
+                                    <div class="max-h-40 overflow-y-auto pr-1 custom-scrollbar space-y-1">
+                                        ${productListHtml}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `}).join('')}
+                </div>
+            `;
+        }
+
+        // --- 4.2. Dashboard del Distribuidor ---
+        function renderDistributorDashboard(salesData) {
+            const distributorData = DISTRIBUTORS[Object.keys(DISTRIBUTORS).find(k => DISTRIBUTORS[k].id === currentUserId)];
+            const mySales = salesData; 
+            
+            // Pestañas de Navegación - ACTUALIZADAS
+            const tabs = [
+                { id: 'dashboard', name: 'Registro de Ventas', icon: 'zap' },
+                { id: 'inventory', name: 'Stock y Productos', icon: 'package' }, // Nueva Pestaña
+                { id: 'orders', name: 'Pedidos', icon: 'truck' }, // Nueva Pestaña
+                { id: 'achievements', name: 'Logros', icon: 'trophy' }
+            ];
+
+            let contentHtml = '';
+            
+            if (currentDistributorTab === 'dashboard') {
+                contentHtml = renderDistributorSalesTab(mySales, distributorData);
+            } else if (currentDistributorTab === 'achievements') {
+                contentHtml = renderDistributorAchievementsTab(mySales, distributorData);
+            } else if (currentDistributorTab === 'orders') {
+                contentHtml = renderDistributorOrdersTab(); // Renderiza la nueva pestaña de Pedidos
+            } else if (currentDistributorTab === 'inventory') {
+                contentHtml = renderDistributorInventoryTab(); // Renderiza la nueva pestaña de Stock/Productos
+            }
+
+            return `
+                <h2 class="text-2xl md:text-3xl font-bold mb-6 text-white border-b border-picofino pb-3">
+                    <i data-lucide="store" class="inline-block mr-2 w-7 h-7 text-picofino"></i>
+                    Dashboard Distribuidor: ${distributorData.name}
+                </h2>
+                <p class="text-sm text-gray-400 mb-8">
+                    Aquí solo ves tus propios datos y rendimiento. ID: <span class="text-picofino font-mono">${currentUserId}</span>
+                </p>
+
+                <!-- Navegación de Pestañas -->
+                <div class="flex border-b border-gray-700 mb-6 overflow-x-auto">
+                    ${tabs.map(tab => `
+                        <button onclick="changeDistributorTab('${tab.id}')"
+                                class="flex-shrink-0 py-2 px-4 text-sm font-medium ${currentDistributorTab === tab.id ? 'border-b-2 border-picofino text-picofino' : 'text-gray-400 hover:text-white'} transition flex items-center">
+                            <i data-lucide="${tab.icon}" class="w-4 h-4 mr-2"></i>
+                            ${tab.name}
+                        </button>
+                    `).join('')}
+                </div>
+                
+                <!-- Contenido de la Pestaña Activa -->
+                ${contentHtml}
+            `;
+        }
+
+        // --- Contenido Pestaña Registro de Ventas (KPIs, Registro y Historial) ---
+        function renderDistributorSalesTab(mySales, distributorData) {
+            const totalUnits = mySales.reduce((sum, s) => sum + s.unitsSold, 0);
+            const totalNewClients = mySales.filter(s => s.newClient).length;
+            
+            // Cálculo del ranking (se debe recalcular cada vez que se registran ventas)
+            const globalSales = fetchSalesData();
+            const distributorSummary = globalSales.reduce((acc, sale) => {
+                acc[sale.distributorId] = (acc[sale.distributorId] || 0) + sale.unitsSold;
+                return acc;
+            }, {});
+            const sortedDistributors = Object.entries(distributorSummary).sort(([, a], [, b]) => b - a);
+            const rankingPosition = sortedDistributors.findIndex(([id]) => id === currentUserId) + 1;
+
+
+            // Autocomplete de clientes
+            const distributorClients = MOCK_CLIENTS.filter(c => c.distributorId === currentUserId);
+            const datalistHtml = distributorClients.map(c => `<option value="${c.name}">`).join('');
+
+            // --- LÓGICA DE AGRUPACIÓN DE PRODUCTOS DE BEBIDA (NUEVA ORGANIZACIÓN) ---
+            const allDrinks = PRODUCTS.filter(p => p.category === 'Bebida');
+            const allFood = PRODUCTS.filter(p => p.category === 'Comida');
+            
+            const groupedDrinks = {
+                magnum: allDrinks.filter(p => p.format === 'magnum'),
+                standard: allDrinks.filter(p => p.format === 'standard'),
+                mini: allDrinks.filter(p => p.format === 'mini'),
+            };
+
+            const renderProductSection = (products, placeholder) => products.map(p => `
+                <div class="flex justify-between items-center bg-gray-700 p-3 rounded-lg shadow-inner hover:ring-2 hover:ring-picofino transition">
+                    <span class="text-white font-medium w-2/3">${p.name}</span>
+                    <input type="number" data-product-name="${p.name}" data-product-id="${p.id}"
+                           placeholder="${placeholder}" value="0" min="0" 
+                           class="w-1/3 ml-4 p-2 border border-gray-600 rounded-lg bg-gray-800 text-picofino text-right font-semibold ring-picofino focus:border-picofino focus:text-white transition">
+                </div>
+            `).join('');
+
+            // Contenido de la sección de Bebidas
+            const drinkSectionsHtml = `
+                <!-- Sección DOBLE MAGNUM -->
+                <details class="mb-4 bg-gray-800 rounded-lg overflow-hidden border border-gray-700">
+                    <summary class="p-3 cursor-pointer flex justify-between items-center font-semibold text-white bg-gray-700/50 hover:bg-gray-700/70 transition">
+                        <span class="flex items-center">
+                            <i data-lucide="bottle-wine" class="w-4 h-4 mr-2 text-orange-400"></i> 
+                            Doble Magnum (3L)
+                        </span>
+                        <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                    </summary>
+                    <div class="p-3 space-y-3">
+                        ${renderProductSection(groupedDrinks.magnum, 'Unidades (3L)')}
+                    </div>
+                </details>
+                
+                <!-- Sección ESTÁNDAR -->
+                <details class="mb-4 bg-gray-800 rounded-lg overflow-hidden border border-gray-700">
+                    <summary class="p-3 cursor-pointer flex justify-between items-center font-semibold text-white bg-gray-700/50 hover:bg-gray-700/70 transition">
+                        <span class="flex items-center">
+                            <i data-lucide="bottle-wine" class="w-4 h-4 mr-2 text-cyan-400"></i> 
+                            Formato Estándar
+                        </span>
+                        <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                    </summary>
+                    <div class="p-3 space-y-3">
+                        ${renderProductSection(groupedDrinks.standard, 'Unidades (Std)')}
+                    </div>
+                </details>
+
+                <!-- Sección MINI -->
+                <details class="mb-4 bg-gray-800 rounded-lg overflow-hidden border border-gray-700">
+                    <summary class="p-3 cursor-pointer flex justify-between items-center font-semibold text-white bg-gray-700/50 hover:bg-gray-700/70 transition">
+                        <span class="flex items-center">
+                            <i data-lucide="bottle-wine" class="w-4 h-4 mr-2 text-red-400"></i> 
+                            Formato Mini
+                        </span>
+                        <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                    </summary>
+                    <div class="p-3 space-y-3">
+                        ${renderProductSection(groupedDrinks.mini, 'Unidades (Mini)')}
+                    </div>
+                </details>
+            `;
+
+            // Contenido de la sección de Comida
+            const foodSectionHtml = `
+                <details id="food-section-details" class="mb-4 bg-gray-800 rounded-lg overflow-hidden border border-gray-700">
+                    <summary class="p-3 cursor-pointer flex justify-between items-center font-semibold text-picofino bg-gray-700/50 hover:bg-gray-700/70 transition">
+                        <span class="flex items-center"><i data-lucide="container" class="w-5 h-5 mr-2"></i> Comida / Conservas</span>
+                        <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                    </summary>
+                    <div class="p-3 space-y-3">
+                        ${renderProductSection(allFood, 'Unidades')}
+                    </div>
+                </details>
+            `;
+
+            // Renderizado del Ranking de Productos Vendidos (Top Productos)
+            const productRanking = mySales.reduce((acc, s) => {
+                acc[s.productName] = (acc[s.productName] || 0) + s.unitsSold;
+                return acc;
+            }, {});
+            const sortedProductRanking = Object.entries(productRanking)
+                .sort(([, a], [, b]) => b - a)
+                .map(([name, units], index) => `
+                    <div class="flex justify-between items-center text-sm p-2 ${index % 2 === 0 ? 'bg-gray-700' : 'bg-gray-800'} rounded-md">
+                        <span class="font-bold text-picofino">${index + 1}.</span>
+                        <span class="text-white">${name}</span>
+                        <span class="font-mono text-gray-300">${units} unidades</span>
+                    </div>
+                `);
+
+            let html = `
+                <!-- KPIs Personalizados -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-gray-700 p-5 rounded-xl shadow-md border-t-4 border-picofino">
+                        <p class="text-sm text-gray-400">Tu Total de Unidades Vendidas</p>
+                        <p class="text-3xl font-bold text-white">${totalUnits}</p>
+                    </div>
+                    <div class="bg-gray-700 p-5 rounded-xl shadow-md border-t-4 border-picofino">
+                        <p class="text-sm text-gray-400">Nuevas Altas (Bares/Tiendas)</p>
+                        <p class="text-3xl font-bold text-white">${totalNewClients}</p>
+                    </div>
+                </div>
+
+                <!-- Contenido Principal: Escritura de Etiqueta y Ranking Productos -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Columna 1: Entrada de Datos (Escritura de Etiqueta) -->
+                    <div class="lg:col-span-2 bg-gray-900 p-6 rounded-xl shadow-inner mb-8">
+                        <h3 class="text-xl font-semibold mb-2 text-white flex items-center">
+                            <i data-lucide="qr-code" class="mr-2 text-picofino"></i>
+                            Escritura de Etiqueta (NFC/RFID Mock)
+                        </h3>
+                        <p class="text-sm text-gray-400 mb-4 border-b border-gray-700 pb-4">
+                            Acerca la etiqueta al lector. Cuando veas <b style="color: var(--color-picofino-accent);">"Etiqueta lista para escritura"</b>
+                            , añade los datos del pedido junto al bar. Cuando esté todo listo, pulsa <b style="color: var(--color-picofino-accent);">"Escribir Etiqueta"</b>y espera una confirmación.
+                        </p>
+                        
+                        <!-- Cliente Info -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 p-4 bg-gray-800 rounded-lg">
+                            <div class="relative col-span-1 md:col-span-2">
+                                <input type="text" id="sale-client" list="distributor-clients" placeholder="1. Nombre del Bar/Tienda (Ej: Coalla)" 
+                                       class="w-full p-3 pr-10 border border-gray-600 rounded-lg bg-gray-700 text-white ring-picofino focus:border-picofino">
+                                <i data-lucide="chevrons-down-up" class="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none"></i>
+                            </div>
+                            <datalist id="distributor-clients">
+                                ${datalistHtml}
+                            </datalist>
+                            
+                            <div class="col-span-1 md:col-span-2 flex items-center space-x-3 bg-gray-700 p-3 rounded-lg">
+                                 <input type="checkbox" id="sale-new-client" class="form-checkbox h-5 w-5 text-picofino bg-gray-600 border-gray-600 rounded">
+                                 <label for="sale-new-client" class="text-gray-300 text-sm font-medium">¿Es un cliente nuevo/alta nueva?</label>
+                            </div>
+                            <!-- Simulación de Estado de Etiqueta -->
+                            <div class="col-span-1 md:col-span-2 p-3 bg-green-900/50 text-green-300 rounded-lg text-sm flex items-center font-medium">
+                                <i data-lucide="nfc" class="w-5 h-5 mr-2"></i>
+                                Etiqueta lista para escritura.
+                            </div>
+                        </div>
+                        
+                        <h4 class="lg:text-lg font-medium mb-3 text-white border-b border-gray-700 pb-2">2. Productos a Entregar</h4>
+
+                        <!-- Lista de Productos organizada por Desplegables -->
+                        <div id="product-list-inputs">
+                            <!-- SECCIÓN BEBIDAS (ABIERTA POR DEFECTO) -->
+                            <details open class="mb-6 bg-gray-800 rounded-xl overflow-hidden border border-gray-700">
+                                <summary class="p-4 cursor-pointer flex justify-between items-center text-lg font-semibold text-picofino bg-gray-700 hover:bg-gray-700/80 transition">
+                                    <span class="flex items-center"><i data-lucide="cup-soda" class="w-6 h-6 mr-2"></i> Bebidas (Vermuts, Cremas, Gin)</span>
+                                    <i data-lucide="chevron-down" class="w-5 h-5"></i>
+                                </summary>
+                                <div class="p-3 space-y-3 border-t border-gray-700">
+                                    ${drinkSectionsHtml}
+                                </div>
+                            </details>
+
+                            <!-- SECCIÓN COMIDA/CONSERVAS (CERRADA POR DEFECTO) -->
+                            ${foodSectionHtml}
+                        </div>
+
+                        <!-- Botón de Envío Único - CAMBIADO EL TEXTO -->
+                        <button onclick="addMockSale('${distributorData.city}')" class="w-full bg-picofino hover:bg-yellow-500 text-gray-900 font-bold py-3 px-4 rounded-lg shadow-lg transition duration-200 flex items-center justify-center text-lg">
+                            <i data-lucide="pencil-ruler" class="w-6 h-6 mr-3"></i>
+                            ESCRIBIR ETIQUETA
+                        </button>
+                    </div>
+
+                    <!-- Columna 2: Ranking de Productos -->
+                    <div class="lg:col-span-1 bg-gray-900 p-6 rounded-xl shadow-inner mb-8">
+                        <h3 class="text-xl font-semibold mb-4 text-white flex items-center">
+                            <i data-lucide="bar-chart-3" class="mr-2 text-picofino"></i>
+                            Top Productos (Tus Ventas)
+                        </h3>
+                        <div class="space-y-2">
+                            ${sortedProductRanking.length > 0 ? sortedProductRanking.join('') : '<p class="text-gray-400">No hay datos de ventas para este ranking.</p>'}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Historial de Ventas del Distribuidor -->
+                <h3 class="text-xl font-semibold mb-4 text-white">Tu Historial de Entregas (Últimos 10)</h3>
+                <div class="space-y-3 max-h-96 overflow-y-auto pr-2">
+                    ${mySales.slice(0, 10).map(s => `
+                        <div class="bg-gray-900 p-4 rounded-lg flex flex-col sm:flex-row justify-between items-start sm:items-center text-sm border-l-4 border-gray-600 hover:border-picofino transition">
+                            <div>
+                                <span class="font-medium text-white">${s.productName} (${s.unitsSold} unidades)</span>
+                                ${s.newClient ? '<span class="ml-2 bg-green-900 text-green-300 px-2 py-0.5 rounded-full text-xs">NUEVA ALTA</span>' : ''}
+                            </div>
+                            <span class="text-gray-400 mt-1 sm:mt-0">${s.clientName} (${s.clientType})</span>
+                        </div>
+                    `).join('') || '<p class="text-gray-400">Aún no has registrado ninguna entrega.</p>'}
+                </div>
+            `;
+            
+            // Adjuntar el listener para la validación del autocompletado después de renderizar
+            setTimeout(() => {
+                const clientInput = document.getElementById('sale-client');
+                if (clientInput) {
+                    clientInput.addEventListener('input', () => {
+                        window.handleClientInputChange(currentUserId);
+                    });
+                    window.handleClientInputChange(currentUserId);
+                }
+            }, 0); 
+            
+            return html;
+        }
+
+        // --- Contenido Pestaña Logros (GAMIFICADO - ROADMAP) ---
+        function renderDistributorAchievementsTab(mySales, distributorData) {
+            const totalUnits = mySales.reduce((sum, s) => sum + s.unitsSold, 0);
+            const totalNewClients = mySales.filter(s => s.newClient).length;
+            const productSales = mySales.reduce((acc, s) => {
+                acc[`${s.productName}_units`] = (acc[`${s.productName}_units`] || 0) + s.unitsSold;
+                return acc;
+            }, {});
+            
+            const stats = {
+                'units': totalUnits,
+                'newClients': totalNewClients,
+                'login': 1, // New metric
+                ...productSales
+            };
+
+            // --- GENERACIÓN DEL MAPA DE AVENTURA ---
+            const roadmapHtml = ACHIEVEMENTS.map((achievement, index) => {
+                const current = stats[achievement.metric] || 0;
+                const progressPercent = Math.min(100, (current / achievement.target) * 100);
+                const isAchieved = current >= achievement.target;
+                
+                // Determinar estrellas (0, 1, 2, 3)
+                let stars = 0;
+                if (progressPercent >= 100) stars = 3;
+                else if (progressPercent >= 66) stars = 2;
+                else if (progressPercent >= 33) stars = 1;
+
+                // Clases dinámicas
+                const nodeColor = isAchieved ? 'bg-green-500 border-green-400' : (progressPercent > 0 ? 'bg-picofino border-yellow-400 level-active' : 'bg-gray-700 border-gray-600');
+                const iconColor = isAchieved ? 'text-white' : (progressPercent > 0 ? 'text-gray-900' : 'text-gray-500');
+                const opacityClass = isAchieved || progressPercent > 0 ? 'opacity-100' : 'opacity-60';
+                
+                // Zig-Zag Logic: Alternar izquierda (impar) y derecha (par)
+                const isLeft = index % 2 === 0; 
+                const rowDirection = 'flex-row'; // Mantener 'flex-row' para la visualización del editor de código
+                const textAlign = isLeft ? 'text-right mr-8' : 'text-left ml-8';
+                
+                // Forzar el zigzag visual usando solo la dirección de texto
+                const actualRowDirection = index % 2 === 0 ? 'flex-row' : 'flex-row-reverse';
+                const actualTextAlign = index % 2 === 0 ? 'text-right mr-8' : 'text-left ml-8';
+
+
+                // Generar estrellas HTML
+                const starsHtml = Array(3).fill(0).map((_, i) => {
+                    const fill = i < stars ? 'fill-yellow-400 text-yellow-400' : 'fill-gray-600 text-gray-600';
+                    return `<i data-lucide="star" class="w-3 h-3 ${fill} drop-shadow-md"></i>`;
+                }).join('');
+
+                return `
+                    <div class="relative flex ${actualRowDirection} items-center justify-center w-full mb-12 z-10">
+                        
+                        <!-- TEXTO Y DETALLES -->
+                        <div class="w-5/12 ${actualTextAlign} ${opacityClass} transition duration-300 hover:scale-105 cursor-default">
+                            <h4 class="text-lg font-bold text-white mb-1">${achievement.name}</h4>
+                            <p class="text-xs text-gray-400 mb-1">${achievement.description}</p>
+                            <div class="text-xs font-mono text-picofino">
+                                ${current} / ${achievement.target}
+                            </div>
+                        </div>
+
+                        <!-- NODO CENTRAL (CIRCULO) -->
+                        <div class="relative flex-shrink-0 w-16 h-16 rounded-full border-4 ${nodeColor} flex items-center justify-center shadow-2xl z-20 level-node cursor-pointer"
+                             onclick="showModal('${achievement.name}', '${achievement.description}<br>Estado: ${isAchieved ? '¡Completado!' : progressPercent.toFixed(0) + '%'}<br><br><i data-lucide=\\'gift\\' class=\\'inline-block w-4 h-4 mr-1 text-picofino\\'></i><strong>Premio:</strong> ${achievement.reward}')">
+                            
+                            <i data-lucide="${achievement.icon}" class="w-8 h-8 ${iconColor}"></i>
+                            
+                            <!-- Estrellas flotantes -->
+                            <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 flex space-x-1 bg-gray-900/80 px-2 py-0.5 rounded-full">
+                                ${starsHtml}
+                            </div>
+                        </div>
+
+                        <!-- ESPACIO VACÍO (Para equilibrar el flex) -->
+                        <div class="w-5/12"></div>
+                    </div>
+                `;
+            }).join('');
+
+            return `
+                <h3 class="text-xl font-semibold mb-6 text-white flex items-center justify-center">
+                    <i data-lucide="map" class="mr-2 text-picofino"></i>
+                    Mapa de Aventura Picofino
+                </h3>
+                
+                <div class="relative max-w-2xl mx-auto pb-10">
+                    <!-- LÍNEA DEL CAMINO (FONDO) -->
+                    <div class="roadmap-path h-full rounded-full shadow-inner"></div>
+                    
+                    <!-- LISTA DE NIVELES -->
+                    <div class="relative pt-4">
+                        ${roadmapHtml}
+                    </div>
+                    
+                    <!-- INICIO DEL CAMINO -->
+                    <div class="text-center mt-4 relative z-10">
+                        <span class="bg-gray-800 text-gray-400 px-4 py-1 rounded-full text-xs border border-gray-600 uppercase tracking-widest">Inicio</span>
+                    </div>
+                </div>
+            `;
+        }
+
+
+        // --- Contenido Pestaña Pedidos (Nuevo) ---
+        function renderDistributorOrdersTab() {
+            // Filtrar los productos por la búsqueda del usuario (solo si hay consulta)
+            const productsToOrder = PRODUCTS.filter(p => {
+                if (!orderSearchQuery) return true;
+                return p.name.toLowerCase().includes(orderSearchQuery.toLowerCase());
+            });
+
+            const productListHtml = productsToOrder.map(p => `
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-gray-700 p-3 rounded-lg shadow-inner mb-3">
+                    <!-- Nombre del producto con Tooltip (Hover) -->
+                    <div class="product-tooltip-container mb-2 sm:mb-0 w-full sm:w-2/3">
+                        <span class="text-white font-medium cursor-help border-b border-dashed border-gray-400">
+                            ${p.name}
+                        </span>
+                        <!-- Tooltip content -->
+                        <span class="product-tooltip">
+                            Cada unidad contiene ${p.unitsPerBox} unidades de producto.
+                            <br>
+                            <span class="text-xs text-gray-400">Precio mock: ${p.price.toFixed(2)} €/unidad</span>
+                        </span>
+                    </div>
+
+                    <!-- Input para la cantidad de Unidades -->
+                    <div class="w-full sm:w-1/3 flex items-center">
+                        <input type="number" data-product-name="${p.name}" data-product-id="${p.id}"
+                            placeholder="Unidades" value="0" min="0" 
+                            class="w-full p-2 border border-gray-600 rounded-lg bg-gray-800 text-picofino text-right font-semibold ring-picofino focus:border-picofino focus:text-white transition order-input">
+                        <span class="ml-2 text-gray-400 text-sm">unidades</span>
+                    </div>
+                </div>
+            `).join('');
+
+            const myOrders = fetchOrdersData();
+
+            return `
+                <h3 class="text-xl font-semibold mb-4 text-white flex items-center border-b border-gray-700 pb-2">
+                    <i data-lucide="shopping-bag" class="mr-2 text-picofino"></i>
+                    Realizar Nuevo Pedido
+                </h3>
+                
+                <p class="text-sm text-gray-400 mb-6">
+                    Introduce la cantidad de <strong>unidades</strong> (paquetes) que deseas pedir de cada producto.
+                    <span class="text-picofino font-semibold">Pasa el ratón por el nombre del producto para ver las unidades individuales por unidad.</span>
+                </p>
+
+                <!-- Barra de Búsqueda de Productos (NUEVO) -->
+                <div class="relative mb-4">
+                    <input type="text" id="order-product-search" placeholder="Buscar producto en la lista de pedido..."
+                           oninput="filterOrdersProduct(this.value)" value="${orderSearchQuery}"
+                           class="w-full p-3 pl-10 border border-gray-600 rounded-lg bg-gray-700 text-white ring-picofino focus:border-picofino transition">
+                    <i data-lucide="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"></i>
+                </div>
+                
+                <!-- Formulario de Pedidos -->
+                <div id="order-form-inputs" class="mb-8 p-5 bg-gray-900 rounded-xl shadow-lg">
+                    ${productsToOrder.length > 0 ? productListHtml : '<p class="text-gray-400">No se encontraron productos que coincidan con la búsqueda.</p>'}
+                    
+                    <button onclick="submitNewOrder()" 
+                            class="mt-4 w-full bg-picofino hover:bg-yellow-500 text-gray-900 font-bold py-3 px-4 rounded-lg shadow-lg transition duration-200 flex items-center justify-center text-lg">
+                        <i data-lucide="mail-check" class="w-6 h-6 mr-3"></i>
+                        Aceptar Pedido
+                    </button>
+                </div>
+
+                <!-- Historial de Pedidos -->
+                <h3 class="text-xl font-semibold mb-4 text-white flex items-center border-b border-gray-700 pb-2">
+                    <i data-lucide="receipt" class="mr-2 text-picofino"></i>
+                    Historial de Pedidos
+                </h3>
+                
+                <!-- Barra de Búsqueda de Historial -->
+                <div class="relative mb-4">
+                    <input type="text" id="order-search" placeholder="Buscar en historial por ID, estado o producto..."
+                           oninput="filterOrders(this.value)" value="${orderSearchQuery}"
+                           class="w-full p-3 pl-10 border border-gray-600 rounded-lg bg-gray-700 text-white ring-picofino focus:border-picofino transition">
+                    <i data-lucide="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"></i>
+                </div>
+                
+                <div class="space-y-4 max-h-96 overflow-y-auto pr-2">
+                    ${myOrders.map(order => {
+                        const date = new Date(order.date).toLocaleDateString();
+                        const totalUnits = order.items.reduce((sum, item) => sum + item.units, 0);
+                        let statusColor;
+                        switch(order.status) {
+                            case 'Pendiente de recibir': statusColor = 'bg-yellow-900 text-yellow-300 border-yellow-300'; break;
+                            case 'En Proceso': statusColor = 'bg-blue-900 text-blue-300 border-blue-300'; break;
+                            case 'Recibido': statusColor = 'bg-green-900 text-green-300 border-green-300'; break;
+                            default: statusColor = 'bg-gray-900 text-gray-300 border-gray-300';
+                        }
+                        
+                        const itemsList = order.items.map(item => `${item.name} (${item.units} unidades)`).join('; ');
+
+                        return `
+                            <div class="bg-gray-900 p-4 rounded-lg border-l-4 border-gray-600 hover:border-picofino transition">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-lg font-bold text-white">Pedido #${order.id}</span>
+                                    <span class="text-xs font-medium px-3 py-1 rounded-full border ${statusColor}">
+                                        ${order.status}
+                                    </span>
+                                </div>
+                                <p class="text-sm text-gray-400">Fecha: ${date}</p>
+                                <p class="text-sm text-gray-300 mt-2">
+                                    <span class="font-semibold text-picofino">Total Unidades: ${totalUnits}</span> |
+                                    <span class="text-gray-400">Detalle: ${itemsList}</span>
+                                </p>
+                            </div>
+                        `;
+                    }).join('') || `<p class="text-gray-400">No se encontraron pedidos. ${orderSearchQuery ? 'Intenta otra búsqueda.' : ''}</p>`}
+                </div>
+            `;
+        }
+
+        // --- Manejar el cambio de umbral de stock bajo (Nuevo) ---
+        window.updateLowStockThreshold = (newValue) => {
+            const threshold = parseInt(newValue);
+            if (!isNaN(threshold) && threshold >= 0) {
+                LOW_STOCK_THRESHOLD = threshold;
+                // Re-renderizar la pestaña de inventario para aplicar el nuevo umbral
+                renderDashboard(fetchSalesData()); 
+            } else {
+                 showModal("Advertencia", "El valor del umbral debe ser un número positivo (0 o mayor).");
+            }
+        };
+
+        // --- Contenido Pestaña Stock y Productos (ACTUALIZADO: a tabla simple) ---
+        function renderDistributorInventoryTab() {
+            const myInventory = fetchInventoryData();
+            
+            // Determinar si el input de umbral debe estar deshabilitado
+            const thresholdDisabled = !isLowStockAlarmEnabled;
+
+            return `
+                <h3 class="text-xl font-semibold mb-4 text-white flex items-center border-b border-gray-700 pb-2">
+                    <i data-lucide="package-open" class="mr-2 text-picofino"></i>
+                    Tu Stock de Productos (Unidades)
+                </h3>
+                
+                <!-- Configuración del Umbral y Toggle -->
+                <div class="mb-6 p-4 bg-gray-700 rounded-xl flex flex-col sm:flex-row items-center justify-between shadow-inner space-y-4 sm:space-y-0">
+                    
+                    <!-- Toggle de Alarma -->
+                    <div class="flex items-center space-x-3">
+                        <label for="alarm-toggle" class="text-sm text-gray-300 font-medium">
+                            Activar Alarma de Stock Bajo
+                        </label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="alarm-toggle" 
+                                   onchange="toggleLowStockAlarm()" 
+                                   ${isLowStockAlarmEnabled ? 'checked' : ''}>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <!-- Umbral de Aviso (dependiente del Toggle) -->
+                    <div class="flex items-center space-x-2">
+                        <label for="low-stock-config" class="text-sm text-gray-300 font-medium whitespace-nowrap">
+                            Umbral de Aviso:
+                        </label>
+                        <input type="number" id="low-stock-config" 
+                               value="${LOW_STOCK_THRESHOLD}" 
+                               min="0"
+                               oninput="updateLowStockThreshold(this.value)"
+                               ${thresholdDisabled ? 'disabled' : ''}
+                               class="w-20 p-2 border border-gray-600 rounded-lg bg-gray-800 text-picofino text-right font-bold ring-picofino focus:border-picofino focus:text-white transition ${thresholdDisabled ? 'opacity-50 cursor-not-allowed' : 'opacity-100'}">
+                        <span class="text-gray-400 text-sm">unidades</span>
+                    </div>
+                </div>
+
+                <!-- Tabla de Stock -->
+                <div class="overflow-x-auto rounded-xl shadow-lg border border-gray-700">
+                    <table class="min-w-full divide-y divide-gray-700">
+                        <thead class="bg-gray-700">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                                    Producto
+                                </th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-300 uppercase tracking-wider">
+                                    Stock (Unidades)
+                                </th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-300 uppercase tracking-wider">
+                                    Unidades/Paquete
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-gray-800 divide-y divide-gray-700">
+                            ${myInventory.map(stockItem => {
+                                const product = PRODUCTS.find(p => p.name === stockItem.productName);
+                                const isLowStock = stockItem.units < LOW_STOCK_THRESHOLD && stockItem.units > 0;
+                                const isOutOfStock = stockItem.units === 0;
+
+                                let rowClass = 'text-white';
+                                let stockColor = 'text-white';
+                                let icon = '';
+
+                                // Aplicar clases de alerta SÓLO si la alarma está activada
+                                if (isLowStockAlarmEnabled) {
+                                    if (isOutOfStock) {
+                                        rowClass = 'bg-red-900/40 text-red-300 hover:bg-red-900/60'; // Rojo oscuro para agotado
+                                        stockColor = 'text-red-300 font-bold';
+                                        icon = '<i data-lucide="x-circle" class="w-4 h-4 mr-2 inline-block text-red-400"></i>';
+                                    } else if (isLowStock) {
+                                        rowClass = 'bg-yellow-900/30 text-yellow-300 hover:bg-yellow-900/50'; // Amarillo oscuro para aviso
+                                        stockColor = 'text-yellow-300 font-bold';
+                                        icon = '<i data-lucide="alert-triangle" class="w-4 h-4 mr-2 inline-block text-yellow-400"></i>';
+                                    }
+                                }
+
+
+                                return `
+                                    <tr class="${rowClass} transition duration-150">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium flex items-center">
+                                            ${icon}
+                                            ${product ? product.name : stockItem.productName}
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-right text-lg font-mono ${stockColor}">
+                                            ${stockItem.units}
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-400">
+                                            ${product ? product.unitsPerBox : 'N/A'}
+                                        </td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        // --- Lógica para el Autocomplete y Checkbox de Nuevo Cliente ---
+        window.handleClientInputChange = (currentDistributorId) => {
+            const clientInput = document.getElementById('sale-client');
+            const newClientCheckbox = document.getElementById('sale-new-client');
+            
+            setTimeout(() => {
+                const clientName = clientInput.value.trim();
+                const exists = MOCK_CLIENTS.some(c => 
+                    c.name === clientName && c.distributorId === currentDistributorId
+                );
+
+                if (exists) {
+                    newClientCheckbox.checked = false;
+                    newClientCheckbox.disabled = true;
+                    newClientCheckbox.parentNode.querySelector('label').classList.add('opacity-50', 'cursor-not-allowed');
+                } else {
+                    newClientCheckbox.disabled = false;
+                    newClientCheckbox.parentNode.querySelector('label').classList.remove('opacity-50', 'cursor-not-allowed');
+                }
+            }, 50); 
+        };
+
+
+        // --- 5. Función para Simular la Entrada de Datos Múltiples (Bulk) ---
+        window.addMockSale = (city) => { 
+            if (currentRole !== 'distributor') {
+                showModal("Acceso Denegado", "Debes estar autenticado como Distribuidor para registrar ventas.");
+                return;
+            }
+
+            // 1. Obtener datos del cliente
+            const clientInput = document.getElementById('sale-client');
+            const newClientCheckbox = document.getElementById('sale-new-client');
+
+            const clientName = clientInput.value.trim();
+            const newClient = newClientCheckbox.checked && !newClientCheckbox.disabled;
+            
+            const existingClient = MOCK_CLIENTS.find(c => c.name === clientName && c.distributorId === currentUserId);
+            let clientType;
+
+            if (newClient) {
+                 clientType = "Nueva Alta / Sin clasificar";
+            } else if (existingClient) {
+                 clientType = existingClient.type; 
+            } else {
+                 clientType = "Tipo Inferido / Existente"; 
+            }
+             
+
+            if (clientName === "") {
+                showModal("Datos Inválidos", "Por favor, introduce el nombre del Bar/Tienda (Cliente).");
+                return;
+            }
+
+            const distributorData = DISTRIBUTORS[Object.keys(DISTRIBUTORS).find(k => DISTRIBUTORS[k].id === currentUserId)];
+            const salesToRegister = [];
+            let totalUnitsRegistered = 0;
+            
+            // 2. Iterar a través de los inputs de cantidad
+            // Importante: Solo procesar inputs visibles (el selector los oculta)
+            const productInputs = document.querySelectorAll('#product-list-inputs input[type="number"]');
+            
+            productInputs.forEach(input => {
+                 // No necesitamos verificar si el contenedor está oculto ya que usamos <details>
+                 // Solo necesitamos comprobar el valor > 0
+                const unitsSold = parseInt(input.value);
+                
+                if (unitsSold > 0) {
+                    const productName = input.dataset.productName;
+                    
+                    salesToRegister.push({
+                        distributorId: currentUserId,
+                        distributorName: distributorData.name,
+                        city: city,
+                        productName: productName,
+                        unitsSold: unitsSold,
+                        clientName: clientName,
+                        clientType: clientType, 
+                        newClient: newClient,
+                        timestamp: Date.now() // Usar el timestamp real para que aparezca primero
+                    });
+                    totalUnitsRegistered += unitsSold;
+                }
+            });
+
+            if (salesToRegister.length === 0) {
+                showModal("Sin Ventas", "No has introducido ninguna cantidad de unidades (>0) para escribir en la etiqueta.");
+                return;
+            }
+
+            // 3. Registrar ventas en el array estático, actualizar stock (mock) y re-renderizar
+            try {
+                // Añadir nuevas ventas
+                MOCK_SALES_DATA.push(...salesToRegister);
+
+                // SIMULAR ACTUALIZACIÓN DE STOCK (Resta de unidades vendidas)
+                salesToRegister.forEach(sale => {
+                    const existingIndex = MOCK_INVENTORY_DATA.findIndex(i => 
+                        i.distributorId === currentUserId && i.productName === sale.productName
+                    );
+
+                    if (existingIndex !== -1) {
+                        MOCK_INVENTORY_DATA[existingIndex].units = Math.max(0, MOCK_INVENTORY_DATA[existingIndex].units - sale.unitsSold);
+                        MOCK_INVENTORY_DATA[existingIndex].lastUpdated = Date.now();
+                    } else {
+                        // Si no estaba en el stock (debería estar para vender), se añade con un valor negativo o 0
+                        MOCK_INVENTORY_DATA.push({
+                            distributorId: currentUserId,
+                            productName: sale.productName,
+                            units: -sale.unitsSold, // Esto puede simular un stock negativo
+                            lastUpdated: Date.now()
+                        });
+                    }
+                });
+
+                // Reordenar (simulando Firestore)
+                MOCK_SALES_DATA.sort((a, b) => b.timestamp - a.timestamp);
+
+                // Si es una nueva alta válida, añadirlo a la lista de mock clients y al datalist
+                if (newClient) {
+                    MOCK_CLIENTS.push({
+                        name: clientName,
+                        city: city, 
+                        type: "Bar/Tienda - Añadido",
+                        distributorId: currentUserId
+                    });
+                    
+                    const datalist = document.getElementById('distributor-clients');
+                    if(datalist) {
+                        const newOption = document.createElement('option');
+                        newOption.value = clientName;
+                        datalist.appendChild(newOption);
+                    }
+                }
+
+                showModal("Escritura Exitosa", `La etiqueta se ha escrito con ${salesToRegister.length} movimientos por un total de ${totalUnitsRegistered} unidades para el cliente ${clientName}.`);
+                
+                // 4. Limpiar el formulario y re-renderizar
+                clientInput.value = '';
+                newClientCheckbox.checked = false;
+                window.handleClientInputChange(currentUserId); 
+                productInputs.forEach(input => input.value = 0);
+                
+                // IMPORTANTE: Después de registrar ventas, el filtro de bebidas debe resetearse a 'magnum'
+                currentDrinkFilter = 'magnum';
+                
+                renderDashboard(fetchSalesData());
+
+            } catch (error) {
+                console.error("Error al añadir documentos:", error);
+                showModal("Error de Guardado", "Ocurrió un error al guardar la información de la entrega.");
+            }
+        };
+
+        // --- 6. Función para Simular el Envío de Pedido (Nuevo) ---
+        window.submitNewOrder = () => {
+            if (currentRole !== 'distributor') {
+                showModal("Acceso Denegado", "Debes estar autenticado como Distribuidor para realizar pedidos.");
+                return;
+            }
+
+            const orderInputs = document.querySelectorAll('#order-form-inputs .order-input');
+            const itemsToOrder = [];
+            let totalUnitsOrdered = 0;
+
+            orderInputs.forEach(input => {
+                const unitsOrdered = parseInt(input.value);
+                if (unitsOrdered > 0) {
+                    const productName = input.dataset.productName;
+                    itemsToOrder.push({
+                        name: productName,
+                        units: unitsOrdered
+                    });
+                    totalUnitsOrdered += unitsOrdered;
+                }
+            });
+
+            if (itemsToOrder.length === 0) {
+                showModal("Pedido Vacío", "Por favor, introduce la cantidad de unidades (>0) para al menos un producto.");
+                return;
+            }
+            
+            const distributorData = DISTRIBUTORS[Object.keys(DISTRIBUTORS).find(k => DISTRIBUTORS[k].id === currentUserId)];
+            const newOrderId = MOCK_ORDERS_DATA.length + 1;
+
+            // 1. Crear el nuevo pedido (JSON)
+            const newOrder = {
+                id: newOrderId,
+                distributorId: currentUserId,
+                date: Date.now(),
+                status: 'Pendiente de recibir', // Estado inicial
+                items: itemsToOrder
+            };
+
+            // 2. Añadirlo al array de Mock
+            MOCK_ORDERS_DATA.push(newOrder);
+
+            // 3. Simular el "Correo mandado" y limpiar el formulario
+            showModal("Pedido Enviado", `¡Tu pedido #${newOrderId} se ha mandado! Total: ${totalUnitsOrdered} unidades. Recibirás una confirmación por email. Su estado inicial es: **Pendiente de recibir**.`);
+
+            orderInputs.forEach(input => input.value = 0);
+            
+            // 4. Re-renderizar la pestaña de Pedidos para que aparezca en el historial
+            renderDashboard(fetchSalesData()); // Llamar al renderizado principal para refrescar
+
+        };
+        
+        // --- Filtro de productos en el formulario de Pedido (NUEVO) - CORREGIDO PARA MANTENER FOCO ---
+        window.filterOrdersProduct = (query) => {
+            // 1. Capturar el estado del input ANTES de re-renderizar
+            const searchInput = document.getElementById('order-product-search');
+            const cursorPosition = searchInput ? searchInput.selectionStart : null;
+            
+            // 2. Utilizamos la variable orderSearchQuery para almacenar la consulta de búsqueda
+            orderSearchQuery = query.toLowerCase().trim(); 
+            
+            // 3. Re-renderizar la pestaña (lo que causa la pérdida de foco)
+            if (currentDistributorTab === 'orders') {
+                renderDashboard(fetchSalesData());
+            }
+            
+            // 4. Restaurar el foco y la posición del cursor después de que el DOM se haya actualizado
+            // Usamos setTimeout(..., 0) para asegurar que se ejecute después del re-render
+            setTimeout(() => {
+                const newSearchInput = document.getElementById('order-product-search');
+                if (newSearchInput) {
+                    newSearchInput.focus();
+                    if (cursorPosition !== null) {
+                        // setSelectionRange permite mantener el cursor donde estaba
+                        newSearchInput.setSelectionRange(cursorPosition, cursorPosition);
+                    }
+                }
+            }, 0);
+        }
+        
+        // Inicializar iconos de Lucide al cargar el script
+        window.onload = () => {
+             lucide.createIcons();
+             // Inicializar el filtro del mapa al cargar el PO Dashboard
+             if (document.getElementById('filter-all')) {
+                 filterMap('all');
+             }
+             // Asegurar que el estado inicial del input de umbral es correcto al cargar el inventario
+             const thresholdInput = document.getElementById('low-stock-config');
+             if (thresholdInput) {
+                 thresholdInput.disabled = !isLowStockAlarmEnabled;
+             }
+        };
+
+    </script>
+</body>
+</html>
