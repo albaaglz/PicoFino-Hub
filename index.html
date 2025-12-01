@@ -9,257 +9,6 @@
     <!-- Carga de Lucide Icons (para iconos) -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" href="styles.css">
-
-    <style>
-        /* Nuevo Tema Picofino: Amarillo Corporativo y Fondos Oscuros */
-        :root {
-            /* Amarillo Corporativo (Acento, Botones, KPIs, Iconos) */
-            --color-picofino-accent: #FFC72C; 
-            /* Amarillo Oscuro/Naranja para Hover */
-            --color-picofino-dark-accent: #FFAD00; 
-            /* Fondo de la Aplicación (Gris muy oscuro/negruzco) */
-            --color-app-bg: #1A202C; 
-            /* Fondo de Tarjetas/Contenedores (Azul-gris oscuro) */
-            --color-card-bg: #2D3748; 
-            /* Texto oscuro para contraste sobre amarillo */
-            --color-picofino-text-dark: #1A202C;
-        }
-
-        /* 1. Reemplazar la paleta 'picofino' (que era azul) por el amarillo de acento */
-        .bg-picofino { background-color: var(--color-picofino-accent); }
-        .text-picofino { color: var(--color-picofino-accent); }
-        .border-picofino { border-color: var(--color-picofino-accent); }
-        .ring-picofino:focus { --tw-ring-color: var(--color-picofino-accent); }
-        
-        /* 2. Estilos generales y fondos oscuros */
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--color-app-bg);
-        }
-        
-        /* 3. Ajustar los tonos de gris de Tailwind para el tema oscuro/azul */
-        .bg-gray-800 { background-color: var(--color-card-bg); } /* Encabezado y Main Container */
-        .bg-gray-700 { background-color: #4A5568; } /* Tarjetas internas, selectores, inputs */
-        .bg-gray-900 { background-color: var(--color-app-bg); } /* Fondo de historial, tablas */
-
-        /* 4. Ajustar colores de texto y borde genéricos usados por el markup */
-        .text-white { color: #E2E8F0; } /* Usar un blanco roto/claro para accesibilidad en fondo oscuro */
-        .text-gray-400 { color: #A0AEC0; }
-        .text-gray-300 { color: #CBD5E0; }
-        .border-gray-600 { border-color: #4A5568; }
-
-        /* 5. Ajustes de color para el tema oscuro (mic button/checkboxes) */
-        /* Botón Flotante y Botones Primarios (amarillo de acento) */
-        .bg-green-600 { background-color: var(--color-picofino-accent); }
-        .hover\:bg-green-700:hover { background-color: var(--color-picofino-dark-accent); } 
-        /* Texto del botón flotante debe ser oscuro para contraste con amarillo */
-        #quick-entry-button { color: var(--color-picofino-text-dark); }
-        /* Texto de botones con fondo picofino */
-        button.bg-picofino, .bg-picofino { color: var(--color-picofino-text-dark); } 
-
-
-        .text-green-400 { color: #48BB78; } 
-        .bg-green-900 { background-color: #1E403C; } 
-        .text-green-300 { color: #68D391; }
-        .bg-picofino:hover { background-color: var(--color-picofino-dark-accent); }
-
-
-        /* Estilos específicos para los puntos del mapa */
-        .map-point {
-            transform: translate(-50%, -100%); 
-        }
-
-        /* Estilo para el Tooltip (Hover) en los nombres de producto de Pedidos */
-        .product-tooltip-container {
-            position: relative;
-            display: inline-block;
-        }
-
-        .product-tooltip {
-            visibility: hidden;
-            width: 200px;
-            background-color: var(--color-card-bg);
-            color: #E2E8F0;
-            text-align: center;
-            border-radius: 6px;
-            padding: 5px 10px;
-            position: absolute;
-            z-index: 10;
-            bottom: 125%; /* Encima */
-            left: 50%;
-            margin-left: -100px;
-            opacity: 0;
-            transition: opacity 0.3s;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
-            border: 1px solid var(--color-picofino-accent);
-            pointer-events: none; /* No bloquear clicks */
-        }
-
-        .product-tooltip-container:hover .product-tooltip {
-            visibility: visible;
-            opacity: 1;
-        }
-
-        /* Toggle Switch Styling */
-        .toggle-switch {
-            @apply relative inline-block w-14 h-8 transition duration-200 ease-in-out cursor-pointer;
-        }
-        .toggle-switch input {
-            @apply opacity-0 w-0 h-0;
-        }
-        .toggle-slider {
-            @apply absolute cursor-pointer top-0 left-0 right-0 bottom-0 bg-gray-600 rounded-full shadow-inner;
-            transition: .4s;
-        }
-        .toggle-slider:before {
-            @apply absolute content-[''] h-6 w-6 left-1 bottom-1 bg-white rounded-full shadow;
-            transition: .4s;
-        }
-        input:checked + .toggle-slider {
-            @apply bg-picofino;
-        }
-        input:checked + .toggle-slider:before {
-            transform: translateX(24px);
-        }
-
-        /* --- ESTILOS ROADMAP CANDY CRUSH --- */
-        .roadmap-path {
-            position: absolute;
-            left: 50%;
-            top: 0;
-            bottom: 0;
-            width: 8px;
-            background: #4A5568;
-            transform: translateX(-50%);
-            border-radius: 4px;
-            z-index: 0;
-        }
-        
-        /* Efecto de nodo de nivel */
-        .level-node {
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .level-node:hover {
-            transform: scale(1.1);
-        }
-        
-        /* Estrellas flotantes */
-        .stars-container {
-            position: absolute;
-            top: -15px;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            gap: 2px;
-        }
-        
-        /* Animación simple de pulso para el siguiente nivel disponible */
-        @keyframes pulse-ring {
-            0% { box-shadow: 0 0 0 0 rgba(255, 199, 44, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(255, 199, 44, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(255, 199, 44, 0); }
-        }
-        .level-active {
-            animation: pulse-ring 2s infinite;
-        }
-        
-        /* Estilos para el Countdown */
-        .countdown-segment {
-            background-color: #2D3748; /* Color de tarjeta */
-            border: 1px solid #4A5568;
-            padding: 8px 12px;
-            border-radius: 8px;
-            text-align: center;
-        }
-
-        /* --- MOBILE: convertir pestañas en menú lateral --- */
-        @media (max-width: 768px) {
-            #distributor-tabs {
-                display: flex;
-                flex-direction: column;
-                border-right: 1px solid #4A5568;
-                width: 180px;
-                padding-right: 10px;
-            }
-
-            #dashboard-tabs-wrapper {
-                display: flex;
-                flex-direction: row;
-            }
-
-            #dashboard-content {
-                margin-left: 15px;
-                flex-grow: 1;
-            }
-        }
-
-
-        /* --- Estilos específicos PicoChat ESTILOS NUEVOS NOE --- */
-        #picochat-chat::-webkit-scrollbar {
-            width: 5px;
-        }
-        #picochat-chat::-webkit-scrollbar-thumb {
-            background: rgba(148, 163, 184, 0.7);
-            border-radius: 999px;
-        }
-
-        /* Onda de audio en el mensaje de salida */
-        .picochat-audio-wave {
-            position: relative;
-            flex: 1;
-            height: 4px;
-            border-radius: 999px;
-            background: rgba(15, 23, 42, 0.35);
-            overflow: hidden;
-        }
-        .picochat-audio-wave::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: repeating-linear-gradient(
-                90deg,
-                rgba(15, 23, 42, 0.1) 0,
-                rgba(15, 23, 42, 0.9) 4px,
-                transparent 4px,
-                transparent 8px
-            );
-            animation: picochat-wave-move 1.1s linear infinite;
-            opacity: 0.9;
-        }
-        @keyframes picochat-wave-move {
-            from { transform: translateX(0); }
-            to   { transform: translateX(-12px); }
-        }
-
-        /* Punto rojo de grabación */
-        .picochat-record-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 999px;
-            background: #f97373;
-            box-shadow: 0 0 0 0 rgba(248, 113, 113, 0.9);
-            animation: picochat-pulse-dot 1.2s infinite;
-        }
-        @keyframes picochat-pulse-dot {
-            0%   { transform: scale(1);   box-shadow: 0 0 0 0 rgba(248, 113, 113, 0.9); }
-            70%  { transform: scale(1.2); box-shadow: 0 0 0 8px rgba(248, 113, 113, 0); }
-            100% { transform: scale(1);   box-shadow: 0 0 0 0 rgba(248, 113, 113, 0); }
-        }
-
-        /* Puntos suspensivos "..." animados */
-        .picochat-record-dots::after {
-            content: "...";
-            animation: picochat-typing-dots 1s steps(3, end) infinite;
-        }
-        @keyframes picochat-typing-dots {
-            0%   { content: ""; }
-            33%  { content: "."; }
-            66%  { content: ".."; }
-            100% { content: "..."; }
-        }
-
-
-    </style>
 </head>
 <body class="min-h-screen p-4 md:p-8">
 
@@ -305,7 +54,7 @@
 
     </div>
 
-    <!-- Botón Flotante para Entrada Rápida MODIFICADO POR NOE --> 
+    <!-- Botón Flotante para Entrada Rápida -->
     <button id="quick-entry-button"
         onclick="openPicoChat()"
         class="fixed bottom-8 right-8 z-40 bg-green-600 hover:bg-green-700 font-bold p-4 rounded-full shadow-2xl transition duration-300 transform hover:scale-105 hidden"
@@ -313,7 +62,7 @@
         <i data-lucide="message-circle" class="w-7 h-7"></i>
     </button>
 
-    <!-- Widget PicoChat (entrada rápida tipo chat) AÑADIDO POR NOE-->
+        <!-- Widget PicoChat (entrada rápida tipo chat) AÑADIDO POR NOE-->
         <div id="picochat-panel"
             class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center">
             <div class="w-full h-full sm:w-[420px] sm:h-[640px] max-h-[95vh] bg-gray-900 border border-gray-700 sm:rounded-2xl rounded-none shadow-2xl flex flex-col overflow-hidden">
@@ -382,7 +131,6 @@
         </div>
         <!-- FIN NOE-->
 
-
     <!-- Script principal de la aplicación -->
     <script type="module">
         // --- 1. CONFIGURACIÓN ESTATICA Y DATOS MOCK ---
@@ -412,7 +160,7 @@
         const CAMPAIGN_DATES = {
             // El contador no es para estas fechas, pero las mantenemos para los premios indirectos
             summer: new Date(new Date().getFullYear() + 1, 6, 1).getTime(), // 1 de Julio del próximo año
-            christmas: new Date(new Date().getFullYear(), 11, 1).getTime(), // 1 de Diciembre de este año
+            christmas: new Date(new Date().getFullYear(), 11, 1).getTime(), // 1 de Diciembre de este año (Evento de Invierno)
         };
 
         // Definición de los trimestres (meses basados en 0, día del fin del trimestre)
@@ -459,9 +207,11 @@
             }
             
             // 2. Comprobar si hay una Campaña (Indirecta) más cercana
+            // El Evento de Invierno/Navidad (1 de Diciembre) y Verano (1 de Julio)
             const campaignDates = [
-                { name: 'Navidad (Evento Indirecto)', date: CAMPAIGN_DATES.christmas, type: 'campaign' },
-                { name: 'Verano (Evento Indirecto)', date: CAMPAIGN_DATES.summer, type: 'campaign' }
+                // Nota: Usamos currentYear y nextYear para que siempre sea la fecha futura más cercana
+                { name: 'Evento de Invierno (Navidad)', date: new Date(currentYear, 11, 1).getTime(), type: 'campaign', reward: 'Evento de Lujo Pagado (Navidad)' },
+                { name: 'Evento de Verano', date: new Date(currentYear + 1, 6, 1).getTime(), type: 'campaign', reward: 'Evento de Lujo Pagado (Verano)' }
             ].filter(e => e.date > now); // Solo eventos futuros
 
             if (campaignDates.length > 0) {
@@ -525,34 +275,79 @@
             { name: 'Vermutería Alfalfa', city: 'Sevilla', type: 'Vermutería', distributorId: 'dist_sev' },
         ];
 
+
         // Mock Achievements para Distribuidor (ACTUALIZADOS CON NUEVOS PREMIOS)
-        const ACHIEVEMENTS = [
+        window.ACHIEVEMENTS = [
             // Premio de Bienvenida (Logro)
             { id: 1, name: "Bienvenido a Picofino", target: 1, metric: 'login', icon: 'zap', level: 'Bronze', achieved: true, 
               description: "Solo por usar la app por primera vez.", reward: "Pack de Bienvenida Picofino", type: "WelcomePack" },
             
-            // Logros de Nivel (Roadmap)
-            { id: 2, name: "Distribuidor Bronce", target: 30, metric: 'units', icon: 'medal', level: 'Bronze', achieved: false, 
-              description: "Supera las 30 unidades grandes vendidas.", reward: "Pack de Merchandising Básico Picofino", type: "Level" },
-            { id: 3, name: "Distribuidor Plata", target: 100, metric: 'units', icon: 'medal', level: 'Silver', achieved: false, 
-              description: "Supera las 100 unidades grandes vendidas.", reward: "Descuento del 2% en el próximo pedido", type: "Level" },
-            { id: 7, name: "Distribuidor Oro", target: 300, metric: 'units', icon: 'medal', level: 'Gold', achieved: false, 
-              description: "Supera las 300 unidades grandes vendidas.", reward: "Experiencia VIP: Visita a la Bodega y Cena", type: "Level" },
-            
-            // Logros de Venta Específica
-            { id: 4, name: "Cazador de Bares", target: 5, metric: 'newClients', icon: 'user-plus', level: 'Bronze', achieved: false, 
-              description: "Consigue 5 altas de clientes nuevas.", reward: "Unidad de Muestras Gratis para nuevos clientes", type: "Sales" },
-            { id: 5, name: "Maestro Turrón", target: 30, metric: 'CREMA DE GINEBRA Y TURRÓN_units', icon: 'snowflake', level: 'Silver', achieved: false, 
-              description: "Vende 30 unidades grandes de CREMA DE GINEBRA Y TURRÓN.", reward: "Botella Edición Limitada Picofino", type: "Sales" },
-            { id: 6, name: "Vermutero", target: 40, metric: 'VERMUT ORIGINAL GIN FUSION_units', icon: 'shrimp', level: 'Gold', achieved: false, 
-              description: "Vende 40 unidades grandes de VERMUT ORIGINAL GIN FUSION.", reward: "Kit de Coctelería Premium Picofino", type: "Sales" },
+            // Ahora usa métrica de 'points' y tiene un target de puntos - Un premio al trimestre. Se necesitan en resumen 150 puntos por trimestre
+            { 
+                id: 4, 
+                name: "Primer Trimestre", 
+                target: 150, 
+                metric: 'points', 
+                icon: 'trending-up', 
+                level: 'Bronze', 
+                achieved: false, 
+                description: "Acumula 150 puntos para canjear la Oferta.", 
+                reward: "Bonificación directa al finalizar el trimestre. Descuento del producto más vendido.", 
+                type: "QuarterlyBonus",
+                startDate: "01 de Enero", 
+                endDate: "30 de Marzo"
+            },
 
-            // Premios Directos y Indirectos (Añadidos a la lista para el renderizado)
-            { id: 8, name: "Bonificación Trimestral", target: 1, metric: 'units', icon: 'trending-up', level: 'Gold', achieved: false, 
-              description: "Bonificación directa al finalizar el trimestre. Ej: Descuento del producto más vendido.", reward: "Descuento Directo al Distribuidor", type: "QuarterlyBonus" },
-            { id: 9, name: "Evento Top 1 Campaña", target: 1, metric: 'units', icon: 'party-popper', level: 'Platinum', achieved: false, 
-              description: "El distribuidor Top 1 elige el bar para el evento de fin de campaña (Navidad/Verano).", reward: "Evento de Lujo Pagado", type: "BiAnnualEvent" },
+            // Trimestre 2
+            { 
+                id: 5, 
+                name: "Segundo Trimestre", 
+                target: 300, 
+                metric: 'points', 
+                icon: 'trending-up', 
+                level: 'Silver', 
+                achieved: false, 
+                description: "Acumula 300 puntos para canjear la Oferta.", 
+                reward: "Bonificación directa al finalizar el trimestre. Descuento del producto más vendido.", 
+                type: "QuarterlyBonus",
+                startDate: "01 de Abril", 
+                endDate: "30 de Junio"
+            },
+
+            // Trimestre 3
+            { 
+                id: 6, 
+                name: "Tercer Trimestre", 
+                target: 500, 
+                metric: 'points', 
+                icon: 'trending-up', 
+                level: 'Gold', 
+                achieved: false, 
+                description: "Acumula 300 puntos para canjear la Oferta.", 
+                reward: "Bonificación directa al finalizar el trimestre. Descuento del producto más vendido.", 
+                type: "QuarterlyBonus",
+                startDate: "01 de Julio", 
+                endDate: "30 de Septiembre"
+            },
+
+            // Trimestre 4
+            { 
+                id: 7, 
+                name: "Cuarto Trimestre", 
+                target: 500, 
+                metric: 'points', 
+                icon: 'trending-up', 
+                level: 'Platinum', 
+                achieved: false,
+                description: "Acumula 300 puntos para canjear la Oferta.", 
+                reward: "Bonificación directa al finalizar el trimestre. Descuento del producto más vendido.", 
+                type: "QuarterlyBonus",
+                startDate: "01 de Octubre", 
+                endDate: "31 de Diciembre"
+            },
         ];
+
+
 
 
         // Colores para el mapa
@@ -608,6 +403,22 @@
              if (level === 'Gold') return 'star';
              if (level === 'Platinum') return 'zap';
              return baseIcon;
+        }
+
+        /**
+         * Calcula la puntuación del distribuidor (puntos)
+         * Fórmula: unidades vendidas * 0.4 + nuevas altas * 0.6
+         * @param {Array} salesData - Las ventas del distribuidor.
+         * @param {boolean} isOwnerView - Si es la vista del dueño (para usar todas las ventas).
+         * @returns {number} La puntuación redondeada.
+         */
+        function calculateDistributorScore(salesData) {
+            const totalUnits = salesData.reduce((sum, s) => sum + s.unitsSold, 0);
+            const totalNewClients = salesData.filter(s => s.newClient).length;
+            
+            // FÓRMULA: unidades_vendidas*0.4 + nuevas_altas*0.6
+            const score = (totalUnits * 0.4) + (totalNewClients * 0.6);
+            return parseFloat(score.toFixed(0)); // Redondeamos para usar puntos enteros
         }
 
 
@@ -942,7 +753,7 @@
         }
         // --- FIN LÓGICA DEL COUNTDOWN ---
 
-        // --- LÓGICA DE BONIFICACIÓN TRIMESTRAL (NUEVO) ---
+        // --- LÓGICA DE BONIFICACIÓN TRIMESTRAL Y CANJE DE PUNTOS ---
         
         /**
          * Calcula el producto más vendido (por unidades) para el distribuidor actual.
@@ -997,7 +808,8 @@
             showModal(title, message);
             lucide.createIcons(); // Recargar iconos dentro del modal
         };
-        // --- FIN LÓGICA DE BONIFICACIÓN TRIMESTRAL ---
+
+        
 
 
         // --- UTILIDADES DEL MAPA ---
@@ -1152,6 +964,7 @@
                 if (!acc[sale.distributorId]) {
                     // Inicializar el objeto con las métricas necesarias
                     acc[sale.distributorId] = {
+                        id: sale.distributorId,
                         name: sale.distributorName,
                         units: 0,
                         newClients: 0,
@@ -1169,11 +982,11 @@
 
             // 2. Calcular la Puntuación para cada distribuidor
             const distributorsWithScore = Object.values(distributorSummary).map(d => {
-                // FÓRMULA: unidades_vendidas*0.4 + nuevas_altas*0.6
-                const score = (d.units * 0.4) + (d.newClients * 0.6);
+                // USAMOS LA FUNCIÓN REUTILIZABLE
+                const score = calculateDistributorScore(MOCK_SALES_DATA.filter(s => s.distributorId === d.id));
                 return {
                     ...d,
-                    score: parseFloat(score.toFixed(2)) // Redondear a 2 decimales para la visualización
+                    score: score // La puntuación ya está redondeada
                 };
             });
 
@@ -1260,7 +1073,7 @@
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Distribuidor</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Unidades Vendidas</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Altas Nuevas</th>
-                                <!-- NUEVA COLUMNA DE PUNTUACIÓN -->
+                                <!-- COLUMNA DE PUNTUACIÓN -->
                                 <th class="px-6 py-3 text-right text-xs font-medium text-picofino uppercase tracking-wider">Puntuación</th>
                             </tr>
                         </thead>
@@ -1272,7 +1085,7 @@
                                     <td class="px-6 py-4 whitespace-nowrap">${d.units}</td>
                                     <td class="px-6 py-4 whitespace-nowrap">${d.newClients}</td>
                                     <!-- VALOR DE PUNTUACIÓN -->
-                                    <td class="px-6 py-4 whitespace-nowrap text-right font-mono">${d.score.toFixed(2)}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right font-mono">${d.score} pts</td>
                                 </tr>
                             `).join('')}
                         </tbody>
@@ -1459,15 +1272,23 @@
             const totalUnits = mySales.reduce((sum, s) => sum + s.unitsSold, 0);
             const totalNewClients = mySales.filter(s => s.newClient).length;
             
-            // Cálculo del ranking (se debe recalcular cada vez que se registran ventas)
-            const globalSales = fetchSalesData();
-            const distributorSummary = globalSales.reduce((acc, sale) => {
-                acc[sale.distributorId] = (acc[sale.distributorId] || 0) + sale.unitsSold;
+            // Cálculo de Puntuación/Puntos (NUEVO)
+            const myScore = calculateDistributorScore(mySales);
+
+            // Renderizado del Ranking de Productos Vendidos (Top Productos)
+            const productRanking = mySales.reduce((acc, s) => {
+                acc[s.productName] = (acc[s.productName] || 0) + s.unitsSold;
                 return acc;
             }, {});
-            const sortedDistributors = Object.entries(distributorSummary).sort(([, a], [, b]) => b - a);
-            const rankingPosition = sortedDistributors.findIndex(([id]) => id === currentUserId) + 1;
-
+            const sortedProductRanking = Object.entries(productRanking)
+                .sort(([, a], [, b]) => b - a)
+                .map(([name, units], index) => `
+                    <div class="flex justify-between items-center text-sm p-2 ${index % 2 === 0 ? 'bg-gray-700' : 'bg-gray-800'} rounded-md">
+                        <span class="font-bold text-picofino">${index + 1}.</span>
+                        <span class="text-white">${name}</span>
+                        <span class="font-mono text-gray-300">${units} unidades</span>
+                    </div>
+                `);
 
             // Autocomplete de clientes
             const distributorClients = MOCK_CLIENTS.filter(c => c.distributorId === currentUserId);
@@ -1550,21 +1371,6 @@
                 </details>
             `;
 
-            // Renderizado del Ranking de Productos Vendidos (Top Productos)
-            const productRanking = mySales.reduce((acc, s) => {
-                acc[s.productName] = (acc[s.productName] || 0) + s.unitsSold;
-                return acc;
-            }, {});
-            const sortedProductRanking = Object.entries(productRanking)
-                .sort(([, a], [, b]) => b - a)
-                .map(([name, units], index) => `
-                    <div class="flex justify-between items-center text-sm p-2 ${index % 2 === 0 ? 'bg-gray-700' : 'bg-gray-800'} rounded-md">
-                        <span class="font-bold text-picofino">${index + 1}.</span>
-                        <span class="text-white">${name}</span>
-                        <span class="font-mono text-gray-300">${units} unidades</span>
-                    </div>
-                `);
-
             let html = `
                 <!-- KPIs Personalizados -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -1576,9 +1382,10 @@
                         <p class="text-sm text-gray-400">Nuevas Altas (Bares/Tiendas)</p>
                         <p class="text-3xl font-bold text-white">${totalNewClients}</p>
                     </div>
+                    <!-- CAMBIADO: POSICIÓN POR PUNTOS TOTALES -->
                     <div class="bg-gray-700 p-5 rounded-xl shadow-md border-t-4 border-picofino">
-                        <p class="text-sm text-gray-400">Posición en Ranking Global</p>
-                        <p class="text-3xl font-bold text-white">${rankingPosition} / ${Object.keys(DISTRIBUTORS).length - 1}</p>
+                        <p class="text-sm text-gray-400">Tus Puntos Totales</p>
+                        <p class="text-3xl font-bold text-white">${myScore} pts</p>
                     </div>
                 </div>
 
@@ -1592,7 +1399,7 @@
                         </h3>
                         <p class="text-sm text-gray-400 mb-4 border-b border-gray-700 pb-4">
                             Acerca la etiqueta al lector. Cuando veas <b style="color: var(--color-picofino-accent);">"Etiqueta lista para escritura"</b>
-                            , añade los datos del pedido junto al bar. Cuando esté todo listo, pulsa <b style="color: var(--color-picofino-accent);">"Escribir Etiqueta"</b>y espera una confirmación.
+                            , añade los datos del pedido junto al bar. Cuando esté todo listo, pulsa <b style="color: var(--color-picofino-accent);">"Escribir Etiqueta"</b> y espera una confirmación.
                         </p>
                         
                         <!-- Cliente Info -->
@@ -1688,6 +1495,8 @@
         function renderDistributorAchievementsTab(mySales, distributorData) {
             // Se asume que mySales son las ventas del distribuidor actual
             const topProduct = getTopProductForCurrentDistributor(mySales);
+            // Cálculo de puntos para el distribuidor actual (Usamos la función unificada)
+            const MOCK_USER_POINTS = calculateDistributorScore(mySales);
 
             const totalUnits = mySales.reduce((sum, s) => sum + s.unitsSold, 0);
             const totalNewClients = mySales.filter(s => s.newClient).length;
@@ -1700,14 +1509,14 @@
                 'units': totalUnits,
                 'newClients': totalNewClients,
                 'login': 1, // New metric
+                'points': MOCK_USER_POINTS, // Puntos reales del distribuidor
                 ...productSales
             };
 
             // Filtrar logros de Nivel/Ventas para el RoadMap
-            const roadmapAchievements = ACHIEVEMENTS.filter(a => a.type === 'Level' || a.type === 'Sales');
+            const roadmapAchievements = ACHIEVEMENTS;
             const welcomeAchievement = ACHIEVEMENTS.find(a => a.type === 'WelcomePack');
             const quarterlyBonus = ACHIEVEMENTS.find(a => a.type === 'QuarterlyBonus');
-            const biAnnualEvent = ACHIEVEMENTS.find(a => a.type === 'BiAnnualEvent');
 
             // --- GENERACIÓN DEL MAPA DE AVENTURA ---
             const roadmapHtml = roadmapAchievements.map((achievement, index) => {
@@ -1730,6 +1539,9 @@
                 const actualRowDirection = index % 2 === 0 ? 'flex-row' : 'flex-row-reverse';
                 const actualTextAlign = index % 2 === 0 ? 'text-right mr-8' : 'text-left ml-8';
 
+                // Mostrar métrica correcta (unidades o puntos)
+                const metricUnit = achievement.metric === 'points' ? 'puntos' : 'unidades';
+
 
                 // Generar estrellas HTML
                 const starsHtml = Array(3).fill(0).map((_, i) => {
@@ -1745,14 +1557,13 @@
                             <h4 class="text-lg font-bold text-white mb-1">${achievement.name}</h4>
                             <p class="text-xs text-gray-400 mb-1">${achievement.description}</p>
                             <div class="text-xs font-mono text-picofino">
-                                ${current} / ${achievement.target}
+                                ${current} ${metricUnit} / ${achievement.target}
                             </div>
                         </div>
 
                         <!-- NODO CENTRAL (CIRCULO) -->
                         <div class="relative flex-shrink-0 w-16 h-16 rounded-full border-4 ${nodeColor} flex items-center justify-center shadow-2xl z-20 level-node cursor-pointer"
-                             onclick="showModal('${achievement.name}', '${achievement.description}<br>Estado: ${isAchieved ? '¡Completado!' : progressPercent.toFixed(0) + '%'}<br><br><i data-lucide=\\'gift\\' class=\\'inline-block w-4 h-4 mr-1 text-picofino\\'></i><strong>Premio:</strong> ${achievement.reward}')">
-                            
+                            onclick="showModal('${achievement.name}', getAchievementModalContent(ACHIEVEMENTS[${index}], ${isAchieved}, ${progressPercent}), '¡Felicidades por tu logro!')">
                             <i data-lucide="${achievement.icon}" class="w-8 h-8 ${iconColor}"></i>
                             
                             <!-- Estrellas flotantes -->
@@ -1766,6 +1577,7 @@
                     </div>
                 `;
             }).join('');
+            
             
             // Componente de Logros-Premio Fijos
             const fixedRewardsHtml = `
@@ -1788,7 +1600,7 @@
                         <p class="mt-3 text-picofino font-semibold text-sm">Premio: ${welcomeAchievement.reward}</p>
                     </div>
 
-                    <!-- Premio Directo (Bonificación Trimestral) - AHORA CLICKABLE -->
+                    <!-- Premio Directo (Bonificación Trimestral) - CLICKABLE -->
                     <div onclick="showQuarterlyBonusModal('${topProduct}')" 
                          class="bg-gray-700 p-5 rounded-xl shadow-lg border-l-4 border-amber-500 cursor-pointer hover:bg-gray-600 transition duration-150">
                         <div class="flex items-center mb-3">
@@ -1796,7 +1608,7 @@
                             <h4 class="text-lg font-bold text-white">${quarterlyBonus.name}</h4>
                         </div>
                         <p class="text-sm text-gray-400">
-                           **Directos del distribuidor:** Recibe una bonificación directa una vez al acabar el trimestre. Por ejemplo, un descuento del producto más vendido.
+                           <b style="color: var(--color-picofino-accent);">Directos del distribuidor:</b> Recibe una bonificación directa una vez al acabar el trimestre. Por ejemplo, un descuento del producto más vendido.
                         </p>
                         <p class="mt-3 text-picofino font-semibold text-sm">Incentivo: Descuento en Producto Top <i data-lucide="chevrons-right" class="inline-block w-4 h-4 ml-1"></i></p>
                     </div>
@@ -1804,13 +1616,15 @@
                     <!-- Premio Indirecto (Evento Bi-Anual) -->
                     <div class="md:col-span-2 bg-gray-700 p-5 rounded-xl shadow-lg border-l-4 border-cyan-500">
                         <div class="flex items-center mb-3">
-                            <i data-lucide="${biAnnualEvent.icon}" class="w-8 h-8 mr-3 text-cyan-400 p-1 bg-cyan-900/50 rounded-full"></i>
-                            <h4 class="text-lg font-bold text-white">${biAnnualEvent.name}</h4>
+                            <i data-lucide="gift" class="w-8 h-8 mr-3 text-cyan-400 p-1 bg-cyan-900/50 rounded-full"></i>
+                            <h4 class="text-lg font-bold text-white">Evento Especial Top 1</h4>
                         </div>
                         <p class="text-sm text-gray-400">
-                            **Indirectos (Campaña):** Se dan 2 veces al año, con la campaña de Navidad y de Verano. El distribuidor top 1 elige el bar para el evento.
+                            <b style="color: var(--color-picofino-accent);">Indirectos (Campaña):</b> Se dan 2 veces al año, con la campaña de Navidad y de Verano. El distribuidor top 1 elige el bar para el evento.
                         </p>
-                        <p class="mt-3 text-picofino font-semibold text-sm">Premio: Elección del lugar para el evento de celebración de la campaña.</p>
+                        <p class="mt-3 text-picofino font-semibold text-sm">
+                            Premio: Elección del lugar para el evento de celebración de la campaña.
+                        </p>
                     </div>
                 </div>
             `;
@@ -1847,17 +1661,20 @@
                     <!-- LÍNEA DEL CAMINO (FONDO) -->
                     <div class="roadmap-path h-full rounded-full shadow-inner"></div>
                     
+                    <!-- INICIO DEL CAMINO -->
+                    <div class="text-center mt-4 relative z-10">
+                        <span class="bg-gray-800 text-gray-400 px-4 py-1 rounded-full text-xs border border-gray-600 uppercase tracking-widest">Inicio</span>
+                    </div>
+
                     <!-- LISTA DE NIVELES -->
                     <div class="relative pt-4">
                         ${roadmapHtml}
                     </div>
                     
-                    <!-- INICIO DEL CAMINO -->
-                    <div class="text-center mt-4 relative z-10">
-                        <span class="bg-gray-800 text-gray-400 px-4 py-1 rounded-full text-xs border border-gray-600 uppercase tracking-widest">Inicio</span>
-                    </div>
+                    
                 </div>
                 
+
                 ${fixedRewardsHtml}
             `;
         }
@@ -1987,6 +1804,22 @@
                  showModal("Advertencia", "El valor del umbral debe ser un número positivo (0 o mayor).");
             }
         };
+
+        window.getAchievementModalContent = function(achievement, isAchieved, progressPercent) {
+            return `
+                <div class="space-y-3 text-sm text-black-200">
+                    <!-- Descripción -->
+                    <p>${achievement.description}</p>
+                    <p><strong>Desde:</strong> ${achievement.startDate}</p>
+                    <p><strong>Hasta:</strong> ${achievement.endDate}</p>
+                    <br>
+                    <strong>Estado:</strong> ${isAchieved ? '¡Completado!' : progressPercent.toFixed(0) + '%'}<br>
+                    <strong>Premio:</strong> ${achievement.reward}
+                </div>
+            `;
+        };
+
+
 
         // --- Contenido Pestaña Stock y Productos (ACTUALIZADO: a tabla simple) ---
         function renderDistributorInventoryTab() {
@@ -2341,7 +2174,6 @@
                  thresholdInput.disabled = !isLowStockAlarmEnabled;
              }
         };
-
         // --- PICOCHAT: WIDGET DE ENTRADA RÁPIDA LÓGICA NOE---
 
         const picoChatState = {
@@ -2517,7 +2349,6 @@
 
         // Inicializar referencias al cargar
         setupPicoChat();
-
 
     </script>
 </body>
