@@ -1,0 +1,181 @@
+/* Nuevo Tema Picofino: Amarillo Corporativo y Fondos Oscuros */
+        :root {
+            /* Amarillo Corporativo (Acento, Botones, KPIs, Iconos) */
+            --color-picofino-accent: #FFC72C; 
+            /* Amarillo Oscuro/Naranja para Hover */
+            --color-picofino-dark-accent: #FFAD00; 
+            /* Fondo de la Aplicación (Gris muy oscuro/negruzco) */
+            --color-app-bg: #1A202C; 
+            /* Fondo de Tarjetas/Contenedores (Azul-gris oscuro) */
+            --color-card-bg: #2D3748; 
+            /* Texto oscuro para contraste sobre amarillo */
+            --color-picofino-text-dark: #1A202C;
+        }
+
+        /* 1. Reemplazar la paleta 'picofino' (que era azul) por el amarillo de acento */
+        .bg-picofino { background-color: var(--color-picofino-accent); }
+        .text-picofino { color: var(--color-picofino-accent); }
+        .border-picofino { border-color: var(--color-picofino-accent); }
+        .ring-picofino:focus { --tw-ring-color: var(--color-picofino-accent); }
+        
+        /* 2. Estilos generales y fondos oscuros */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--color-app-bg);
+        }
+        
+        /* 3. Ajustar los tonos de gris de Tailwind para el tema oscuro/azul */
+        .bg-gray-800 { background-color: var(--color-card-bg); } /* Encabezado y Main Container */
+        .bg-gray-700 { background-color: #4A5568; } /* Tarjetas internas, selectores, inputs */
+        .bg-gray-900 { background-color: var(--color-app-bg); } /* Fondo de historial, tablas */
+
+        /* 4. Ajustar colores de texto y borde genéricos usados por el markup */
+        .text-white { color: #E2E8F0; } /* Usar un blanco roto/claro para accesibilidad en fondo oscuro */
+        .text-gray-400 { color: #A0AEC0; }
+        .text-gray-300 { color: #CBD5E0; }
+        .border-gray-600 { border-color: #4A5568; }
+
+        /* 5. Ajustes de color para el tema oscuro (mic button/checkboxes) */
+        /* Botón Flotante y Botones Primarios (amarillo de acento) */
+        .bg-green-600 { background-color: var(--color-picofino-accent); }
+        .hover\:bg-green-700:hover { background-color: var(--color-picofino-dark-accent); } 
+        /* Texto del botón flotante debe ser oscuro para contraste con amarillo */
+        #quick-entry-button { color: var(--color-picofino-text-dark); }
+        /* Texto de botones con fondo picofino */
+        button.bg-picofino, .bg-picofino { color: var(--color-picofino-text-dark); } 
+
+
+        .text-green-400 { color: #48BB78; } 
+        .bg-green-900 { background-color: #1E403C; } 
+        .text-green-300 { color: #68D391; }
+        .bg-picofino:hover { background-color: var(--color-picofino-dark-accent); }
+
+
+        /* Estilos específicos para los puntos del mapa */
+        .map-point {
+            transform: translate(-50%, -100%); 
+        }
+
+        /* Estilo para el Tooltip (Hover) en los nombres de producto de Pedidos */
+        .product-tooltip-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .product-tooltip {
+            visibility: hidden;
+            width: 200px;
+            background-color: var(--color-card-bg);
+            color: #E2E8F0;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px 10px;
+            position: absolute;
+            z-index: 10;
+            bottom: 125%; /* Encima */
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--color-picofino-accent);
+            pointer-events: none; /* No bloquear clicks */
+        }
+
+        .product-tooltip-container:hover .product-tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Toggle Switch Styling */
+        .toggle-switch {
+            @apply relative inline-block w-14 h-8 transition duration-200 ease-in-out cursor-pointer;
+        }
+        .toggle-switch input {
+            @apply opacity-0 w-0 h-0;
+        }
+        .toggle-slider {
+            @apply absolute cursor-pointer top-0 left-0 right-0 bottom-0 bg-gray-600 rounded-full shadow-inner;
+            transition: .4s;
+        }
+        .toggle-slider:before {
+            @apply absolute content-[''] h-6 w-6 left-1 bottom-1 bg-white rounded-full shadow;
+            transition: .4s;
+        }
+        input:checked + .toggle-slider {
+            @apply bg-picofino;
+        }
+        input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+
+        /* --- ESTILOS ROADMAP CANDY CRUSH --- */
+        .roadmap-path {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 8px;
+            background: #4A5568;
+            transform: translateX(-50%);
+            border-radius: 4px;
+            z-index: 0;
+        }
+        
+        /* Efecto de nodo de nivel */
+        .level-node {
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .level-node:hover {
+            transform: scale(1.1);
+        }
+        
+        /* Estrellas flotantes */
+        .stars-container {
+            position: absolute;
+            top: -15px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 2px;
+        }
+        
+        /* Animación simple de pulso para el siguiente nivel disponible */
+        @keyframes pulse-ring {
+            0% { box-shadow: 0 0 0 0 rgba(255, 199, 44, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 199, 44, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 199, 44, 0); }
+        }
+        .level-active {
+            animation: pulse-ring 2s infinite;
+        }
+        
+        /* Estilos para el Countdown */
+        .countdown-segment {
+            background-color: #2D3748; /* Color de tarjeta */
+            border: 1px solid #4A5568;
+            padding: 8px 12px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        /* --- MOBILE: convertir pestañas en menú lateral --- */
+        @media (max-width: 768px) {
+            #distributor-tabs {
+                display: flex;
+                flex-direction: column;
+                border-right: 1px solid #4A5568;
+                width: 180px;
+                padding-right: 10px;
+            }
+
+            #dashboard-tabs-wrapper {
+                display: flex;
+                flex-direction: row;
+            }
+
+            #dashboard-content {
+                margin-left: 15px;
+                flex-grow: 1;
+            }
+        }
