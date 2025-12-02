@@ -17,7 +17,7 @@
         <header class="mb-8 p-4 bg-gray-800 rounded-xl shadow-lg flex flex-col md:flex-row justify-between items-center">
             <h1 class="text-3xl font-extrabold text-picofino mb-4 md:mb-0">
                 <i data-lucide="award" class="inline-block mr-2 w-6 h-6"></i>
-                Picofino Sales Hub (Mockup Estático)
+                Portal de Pico a Pico
             </h1>
             <div id="auth-section" class="flex items-center space-x-4">
                 <span class="text-white text-sm">Seleccionar Rol:</span>
@@ -1060,9 +1060,6 @@
                     </div>
                 </div>
 
-                <!-- MAPA -->
-                ${mapHtml}
-
                 <!-- Ranking de Distribuidores -->
                 <h3 class="text-xl font-semibold mb-4 text-white mt-8">Ranking de Distribuidores (Unidades Vendidas y Puntuación)</h3>
                 <div class="overflow-x-auto mb-8">
@@ -1092,6 +1089,9 @@
                     </table>
                     <p class="text-xs text-gray-500 mt-2 p-2">*Puntuación calculada como: Unidades Vendidas * 0.4 + Altas Nuevas * 0.6</p>
                 </div>
+
+                <!-- MAPA -->
+                ${mapHtml}
             `;
         }
 
